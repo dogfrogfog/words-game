@@ -24,7 +24,8 @@
     "node": true
   },
   "rules": {
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "eol-last": "error"
   },
   "import/resolver": {
     "typescript": {}

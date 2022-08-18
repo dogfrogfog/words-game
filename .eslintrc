@@ -27,7 +27,7 @@
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
     "react/function-component-definition": [
-      "enabled",
+      2,
       {
         "namedComponents": "arrow-function"
       }

@@ -4,8 +4,8 @@
   "extends": [
     "plugin:prettier/recommended",
     "prettier",
-    "airbnb/base",
-    "airbnb-typescript/base",
+    "airbnb",
+    "airbnb-typescript",
     "airbnb/hooks",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
@@ -24,7 +24,14 @@
     "node": true
   },
   "rules": {
+    "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
-    "eol-last": "error"
+    "eol-last": "error",
+    "jsx-quotes": ["error", "prefer-single"]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }

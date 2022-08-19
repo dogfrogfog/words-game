@@ -1,13 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-
-const App = () => {
-  return (
-    <div className='App'>
-      <h1>Hello world!</h1>
-    </div>
-  );
-};
+import App from 'App';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -15,3 +8,5 @@ root.render(
     <App />
   </StrictMode>,
 );
+
+export default App;

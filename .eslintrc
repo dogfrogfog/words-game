@@ -1,6 +1,9 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["prettier", "@typescript-eslint"],
+  "plugins": [
+    "prettier",
+    "@typescript-eslint"
+  ],
   "extends": [
     "plugin:prettier/recommended",
     "prettier",
@@ -33,7 +36,10 @@
       }
     ],
     "eol-last": "error",
-    "jsx-quotes": ["error", "prefer-single"]
+    "jsx-quotes": [
+      "error",
+      "prefer-single"
+    ]
   },
   "settings": {
     "import/resolver": {

@@ -32,7 +32,9 @@ const Footer = () => (
         Разработчики:
       </span>
       {Object.entries(developers).map(([name, link]) => (
-        <DevelopersLink href={link}>{name}</DevelopersLink>
+        <DevelopersLink href={link} key={name}>
+          {name}
+        </DevelopersLink>
       ))}
     </div>
     <a href='http://' target='_blank' className='w-[100px]' rel='noreferrer'>

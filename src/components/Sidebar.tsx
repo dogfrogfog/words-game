@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react';
-import homeImg from 'assets/svg/menu/home.svg';
-import bookImg from 'assets/svg/menu/book.svg';
-import audioImg from 'assets/svg/menu/audio.svg';
-import sprintImg from 'assets/svg/menu/sprint.svg';
-import statisticsImg from 'assets/svg/menu/statistics.svg';
+import home from 'assets/svg/home.svg';
+import textbook from 'assets/svg/book.svg';
+import audioChallenge from 'assets/svg/audio.svg';
+import sprint from 'assets/svg/sprint.svg';
+import statistics from 'assets/svg/statistics.svg';
 
+interface ISidebarProps {
+  menuState: boolean;
+}
 interface IMenuImages {
   audioChallenge: string;
   home: string;
@@ -14,11 +17,11 @@ interface IMenuImages {
 }
 
 const menuImages: IMenuImages = {
-  audioChallenge: audioImg,
-  home: homeImg,
-  textbook: bookImg,
-  sprint: sprintImg,
-  statistics: statisticsImg,
+  audioChallenge,
+  home,
+  textbook,
+  sprint,
+  statistics,
 };
 
 interface INavigationItemProps {
@@ -39,20 +42,20 @@ const NavigationItem = ({ children, image }: INavigationItemProps) => (
   </div>
 );
 
-const Navigation = () => (
-  <nav className='container flex flex-col gap-[25px] items-center text-xl font-bold'>
-    <NavigationItem image='home'>Home</NavigationItem>
-    <NavigationItem image='textbook'>Textbook</NavigationItem>
-    <NavigationItem image='audioChallenge'>Audio Challenge</NavigationItem>
-    <NavigationItem image='sprint'>Sprint</NavigationItem>
-    <NavigationItem image='statistics'>Statistics</NavigationItem>
-  </nav>
-);
-
-const Sidebar = () => (
-  <aside className='w-[100px] min-w-[100px] min-h-full bg-gray-100 border-x-4 divide-double rounded pt-1'>
-    <Navigation />
-  </aside>
-);
+const Sidebar = ({ menuState }: ISidebarProps) => {
+  const asideWidth = menuState ? 'max-w-[110px]' : 'max-w-0';
+  const asideClass = `min-h-full bg-gray-100 border-x-4 divide-double rounded pt-1 overflow-hidden transition-all duration-500 ${asideWidth} md:max-w-[110px]`;
+  return (
+    <aside className={asideClass}>
+      <nav className='container flex flex-col gap-[25px] items-center h-full text-xl font-bold'>
+        <NavigationItem image='home'>Home</NavigationItem>
+        <NavigationItem image='textbook'>Textbook</NavigationItem>
+        <NavigationItem image='audioChallenge'>Audio Challenge</NavigationItem>
+        <NavigationItem image='sprint'>Sprint</NavigationItem>
+        <NavigationItem image='statistics'>Statistics</NavigationItem>
+      </nav>
+    </aside>
+  );
+};
 
 export default Sidebar;

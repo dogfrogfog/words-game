@@ -2,16 +2,18 @@ import type { ReactNode } from 'react';
 
 interface IButtonProps {
   children: ReactNode;
+  openForm: () => void;
 }
 
 interface INavigationItemProps {
   children: ReactNode;
 }
 
-const Button = ({ children }: IButtonProps) => (
+const Button = ({ children, openForm }: IButtonProps) => (
   <button
     type='button'
     className='text-xl bg-orange-400/90 rounded-full px-3 py-1 transition-colors hover:bg-orange-500'
+    onClick={openForm}
   >
     {children}
   </button>
@@ -33,13 +35,17 @@ const Navigation = () => (
   </nav>
 );
 
-const Header = () => (
+interface IHeaderProps {
+  handleOnOpen: () => void;
+}
+
+const Header = ({ handleOnOpen }: IHeaderProps) => (
   <div className='flex gap-[40px] items-center justify-between w-full py-4 px-8 fixed top-0 left-0 bg-blue-400'>
     <Logo />
     <div className='ml-auto'>
       <Navigation />
     </div>
-    <Button>Login</Button>
+    <Button openForm={handleOnOpen}>Login</Button>
   </div>
 );
 

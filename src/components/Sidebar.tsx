@@ -28,13 +28,13 @@ const menuImages: IMenuImages = {
   statistics,
 };
 
-interface INavigationItemProps {
+interface ILinkItemProps {
   children: ReactNode;
   image: keyof IMenuImages;
   route: Routes;
 }
 
-const NavigationItem = ({ children, image, route }: INavigationItemProps) => (
+const LinkItem = ({ children, image, route }: ILinkItemProps) => (
   <Link
     to={route}
     className='group hover:text-orange-500 duration-300 transition-colors cursor-pointer flex flex-col items-center'
@@ -56,21 +56,21 @@ const Sidebar = ({ menuState }: ISidebarProps) => {
   return (
     <aside className={asideClass}>
       <nav className='container flex flex-col gap-[25px] items-center h-full text-xl font-bold'>
-        <NavigationItem route={Routes.HOME} image='home'>
+        <LinkItem route={Routes.HOME} image='home'>
           Home
-        </NavigationItem>
-        <NavigationItem route={Routes.WORDBOOK} image='wordbook'>
+        </LinkItem>
+        <LinkItem route={Routes.WORDBOOK} image='wordbook'>
           Wordbook
-        </NavigationItem>
-        <NavigationItem route={Routes.CHALLANGE} image='audioChallenge'>
+        </LinkItem>
+        <LinkItem route={Routes.CHALLANGE} image='audioChallenge'>
           Audio Challenge
-        </NavigationItem>
-        <NavigationItem route={Routes.SPRINT} image='sprint'>
+        </LinkItem>
+        <LinkItem route={Routes.SPRINT} image='sprint'>
           Sprint
-        </NavigationItem>
-        <NavigationItem route={Routes.STATICTICS} image='statistics'>
+        </LinkItem>
+        <LinkItem route={Routes.STATICTICS} image='statistics'>
           Statistics
-        </NavigationItem>
+        </LinkItem>
       </nav>
     </aside>
   );

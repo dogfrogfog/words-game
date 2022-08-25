@@ -6,7 +6,7 @@ import Modal from './Modal';
 
 const App = () => {
   const [modalActive, setModalActive] = useState(false);
-  const handleOnClose = () => setModalActive(false);
+  const handleClose = () => setModalActive(false);
 
   return (
     <div className='flex flex-col justify-between h-screen pt-[70px] relative'>
@@ -15,7 +15,7 @@ const App = () => {
         <Home />
       </main>
       <Footer />
-      <Modal onClose={handleOnClose} visible={modalActive} />
+      <Modal onClose={handleClose} visible={modalActive} />
     </div>
   );
 };

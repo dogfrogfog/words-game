@@ -1,19 +1,18 @@
+import { useState } from 'react';
+import { LoginForm, RegisterForm } from './LoginRegisterForm';
+
 interface IModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const LoginForm = () => <div>Login form</div>;
-
 const Modal = ({ visible, onClose }: IModalProps) => {
-  const handleOnClose = () => {
-    onClose();
-  };
+  const [formActive, setFormActive] = useState(true);
   if (!visible) return null;
   return (
     <div
-      onClick={handleOnClose}
-      onKeyDown={handleOnClose}
+      onClick={() => onClose()}
+      onKeyDown={() => onClose()}
       aria-hidden
       className='w-screen h-screen
       fixed inset-0
@@ -29,7 +28,8 @@ const Modal = ({ visible, onClose }: IModalProps) => {
         onKeyDown={(e) => e.stopPropagation()}
         aria-hidden
       >
-        <LoginForm />
+        <LoginForm visible={formActive} onChange={() => setFormActive(false)} />
+        <RegisterForm visible={formActive} onChange={() => setFormActive(true)} />
       </div>
     </div>
   );

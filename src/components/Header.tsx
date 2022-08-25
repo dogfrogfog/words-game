@@ -36,16 +36,16 @@ const Navigation = () => (
 );
 
 interface IHeaderProps {
-  handleOnOpen: () => void;
+  handleOpen: () => void;
 }
 
-const Header = ({ handleOnOpen }: IHeaderProps) => (
+const Header = ({ handleOpen }: IHeaderProps) => (
   <div className='flex gap-[40px] items-center justify-between w-full py-4 px-8 fixed top-0 left-0 bg-blue-400'>
     <Logo />
     <div className='ml-auto'>
       <Navigation />
     </div>
-    <Button openForm={handleOnOpen}>Login</Button>
+    <Button openForm={handleOpen}>Login</Button>
   </div>
 );
 

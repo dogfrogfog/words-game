@@ -10,7 +10,7 @@ const App = () => {
 
   return (
     <div className='flex flex-col justify-between h-screen pt-[70px] relative'>
-      <Header handleOnOpen={() => setModalActive(true)} />
+      <Header handleOpen={() => setModalActive(true)} />
       <main className='flex justify-between px-2 h-full'>
         <Home />
       </main>

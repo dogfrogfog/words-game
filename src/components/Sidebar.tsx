@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
+import { Link } from '@tanstack/react-location';
+
 import home from 'assets/svg/home.svg';
-import textbook from 'assets/svg/book.svg';
+import wordbook from 'assets/svg/book.svg';
 import audioChallenge from 'assets/svg/audio.svg';
 import sprint from 'assets/svg/sprint.svg';
 import statistics from 'assets/svg/statistics.svg';
+
+import Routes from 'constants/routes';
 
 interface ISidebarProps {
   menuState: boolean;
@@ -11,7 +15,7 @@ interface ISidebarProps {
 interface IMenuImages {
   audioChallenge: string;
   home: string;
-  textbook: string;
+  wordbook: string;
   sprint: string;
   statistics: string;
 }
@@ -19,27 +23,31 @@ interface IMenuImages {
 const menuImages: IMenuImages = {
   audioChallenge,
   home,
-  textbook,
+  wordbook,
   sprint,
   statistics,
 };
 
-interface INavigationItemProps {
+interface ILinkItemProps {
   children: ReactNode;
   image: keyof IMenuImages;
+  route: Routes;
 }
 
-const NavigationItem = ({ children, image }: INavigationItemProps) => (
-  <div className='group hover:text-orange-500 duration-300 transition-colors cursor-pointer flex flex-col items-center'>
-    <div className='w-[50px] h-[50px]'>
+const LinkItem = ({ children, image, route }: ILinkItemProps) => (
+  <Link
+    to={route}
+    className='group hover:text-orange-500 duration-300 transition-colors cursor-pointer flex flex-col items-center'
+  >
+    <div className='w-[50px] h-[50px] text-center'>
       <img
         src={menuImages[image]}
         alt={image}
-        className='h-[50px] object-contain group-hover:scale-75 transition-transform duration-500'
+        className='h-[50px] object-contain group-hover:scale-75 transition-transform duration-500 inline-block'
       />
     </div>
     <span className='text-center'>{children}</span>
-  </div>
+  </Link>
 );
 
 const Sidebar = ({ menuState }: ISidebarProps) => {
@@ -48,11 +56,21 @@ const Sidebar = ({ menuState }: ISidebarProps) => {
   return (
     <aside className={asideClass}>
       <nav className='container flex flex-col gap-[25px] items-center h-full text-xl font-bold'>
-        <NavigationItem image='home'>Home</NavigationItem>
-        <NavigationItem image='textbook'>Textbook</NavigationItem>
-        <NavigationItem image='audioChallenge'>Audio Challenge</NavigationItem>
-        <NavigationItem image='sprint'>Sprint</NavigationItem>
-        <NavigationItem image='statistics'>Statistics</NavigationItem>
+        <LinkItem route={Routes.HOME} image='home'>
+          Home
+        </LinkItem>
+        <LinkItem route={Routes.WORDBOOK} image='wordbook'>
+          Wordbook
+        </LinkItem>
+        <LinkItem route={Routes.CHALLANGE} image='audioChallenge'>
+          Audio Challenge
+        </LinkItem>
+        <LinkItem route={Routes.SPRINT} image='sprint'>
+          Sprint
+        </LinkItem>
+        <LinkItem route={Routes.STATICTICS} image='statistics'>
+          Statistics
+        </LinkItem>
       </nav>
     </aside>
   );

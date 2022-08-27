@@ -1,9 +1,9 @@
 enum Routes {
   HOME = '/',
   WORDBOOK = '/wordbook',
-  CHALLANGE = '/challange',
+  CHALLENGE = '/challenge',
   SPRINT = '/sprint',
-  STATICTICS = '/statictics',
+  STATISTICS = '/statistics',
 }
 
 export default Routes;

@@ -1,7 +1,7 @@
-const Challange = () => (
+const Challenge = () => (
   <div className='py-2 px-2 w-full'>
-    <h2>Challange</h2>
+    <h2>Challenge</h2>
   </div>
 );
 
-export default Challange;
+export default Challenge;

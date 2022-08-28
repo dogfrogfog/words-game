@@ -44,9 +44,9 @@ const App = () => {
   };
   return (
     <Router routes={routes} location={location}>
-      <div className='flex flex-col justify-between h-screen pt-[70px] relative'>
+      <div className='flex flex-col justify-between min-h-screen pt-[68px] relative'>
         <Header menuState={isMenuOpen} toggleMenu={toggleMenu} />
-        <main className='flex justify-between pr-2 h-full'>
+        <main className='flex justify-between h-full'>
           <Sidebar menuState={isMenuOpen} />
           <Outlet />
         </main>

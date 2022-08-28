@@ -47,7 +47,7 @@ const Header = ({ menuState, toggleMenu }: IHeaderProps) => (
   <div className='flex  gap-[40px] items-center justify-between w-full py-4 px-8 fixed top-0 left-0 bg-blue-400'>
     <MenuButton menuState={menuState} toggleMenu={toggleMenu} />
     <div className='mx-auto'>
-      <h1 className='text-3xl'>RSLang</h1>
+      <h1 className='text-3xl'>RS Lang</h1>
     </div>
     <Button>Login</Button>
   </div>

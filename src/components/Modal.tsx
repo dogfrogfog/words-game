@@ -20,7 +20,8 @@ const Modal = ({ visible, onClose }: IModalProps) => {
       bg-opacity-50
       flex
       justify-center
-      items-center'
+      items-center
+      z-50'
     >
       <div
         className='p-5 bg-white rounded-md'

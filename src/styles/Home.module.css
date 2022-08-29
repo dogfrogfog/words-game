@@ -1,7 +1,3 @@
-.parent{
-  @apply w-full h-full;
-}
-
 .section{
-  @apply flex flex-col justify-center items-center flex-wrap min-h-[calc(100vh-61px)] gap-5;
+  @apply flex flex-col justify-center items-center flex-wrap min-h-[calc(100vh-61px)] gap-5 transition-all duration-500;
 }

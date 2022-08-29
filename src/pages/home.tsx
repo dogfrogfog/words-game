@@ -4,6 +4,7 @@ import slanx from 'assets/img/slanx.jpg';
 import nikitaKakurin from 'assets/img/nikitaKakurin.jpg';
 import thelastandrew from 'assets/img/thelastandrew.jpg';
 import styles from 'styles/Home.module.css';
+import { useEffect, useState } from 'react';
 
 const TeamMembers = [
   {
@@ -45,8 +46,27 @@ interface ITeamItemProps {
   item: ITeamItem;
 }
 
-const About = () => (
-  <section className={`bg-about-bg ${styles.section} bg-center bg-cover bg-no-repeat`}>
+interface ISectionsProps {
+  id: 'about' | 'learnWords' | 'playGames' | 'statistics' | 'team';
+  visibleIdSet: Set<string>;
+  unVisibleIdSet: Set<string>;
+}
+
+const showSections = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => {
+  if (unVisibleIdSet.has(id)) return 'opacity-0 -translate-y-[200px]';
+  if (visibleIdSet.has(id)) return '';
+  return 'opacity-0 translate-y-[200px]';
+};
+
+const About = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
+  <section
+    id='about'
+    className={`bg-about-bg ${styles.section}  bg-center  bg-cover bg-no-repeat  ${showSections({
+      visibleIdSet,
+      id,
+      unVisibleIdSet,
+    })}`}
+  >
     <h2 className='text-7xl mx-auto text-center font-bold'>
       <span className='text-yellow-700'>R</span>
       <span className='text-lime-400'>S</span>
@@ -63,8 +83,15 @@ const About = () => (
   </section>
 );
 
-const LearnWords = () => (
-  <section className={`bg-wordbook-bg ${styles.section} bg-right bg-cover bg-no-repeat`}>
+const LearnWords = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
+  <section
+    id='learnWords'
+    className={`bg-wordbook-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+      visibleIdSet,
+      id,
+      unVisibleIdSet,
+    })}`}
+  >
     <h2 className='text-7xl mx-auto text-center font-bold'>
       <span className='text-yellow-700'>L</span>
       <span className='text-lime-600'>e</span>
@@ -100,8 +127,15 @@ const LearnWords = () => (
   </section>
 );
 
-const PlayGames = () => (
-  <section className={`bg-game-bg ${styles.section} bg-right bg-cover bg-no-repeat`}>
+const PlayGames = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
+  <section
+    id='playGames'
+    className={`bg-game-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+      visibleIdSet,
+      id,
+      unVisibleIdSet,
+    })}`}
+  >
     <h2 className='text-7xl mx-auto text-center font-bold w-full'>
       <span className='text-yellow-700'>P</span>
       <span className='text-lime-600'>l</span>
@@ -154,8 +188,15 @@ const PlayGames = () => (
     </div>
   </section>
 );
-const Statistics = () => (
-  <section className={`bg-statistics-bg ${styles.section} bg-right bg-cover bg-no-repeat`}>
+const Statistics = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
+  <section
+    id='statistics'
+    className={`bg-statistics-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+      visibleIdSet,
+      id,
+      unVisibleIdSet,
+    })}`}
+  >
     <h2 className='text-7xl mx-auto text-center font-bold'>
       <span className='text-yellow-700'>A</span>
       <span className='text-lime-700'>n</span>
@@ -206,8 +247,17 @@ const TeamItem = ({ item }: ITeamItemProps) => {
   );
 };
 
-const Team = () => (
-  <section className={`bg-gradient-to-br from-zinc-400 via-zinc-100 to-zinc-400 ${styles.section}`}>
+const Team = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
+  <section
+    id='team'
+    className={`bg-gradient-to-br from-zinc-400 via-zinc-100 to-zinc-400 ${
+      styles.section
+    } ${showSections({
+      visibleIdSet,
+      id,
+      unVisibleIdSet,
+    })}`}
+  >
     <h2 className='bg-clip-text text-transparent bg-gradient-to-br from-slate-700 via-slate-500 to-slate-900 text-7xl mx-auto text-center font-bold'>
       Our Team
     </h2>
@@ -216,20 +266,60 @@ const Team = () => (
     </p>
     <div className='flex justify-center items-center flex-wrap gap-[40px] '>
       {TeamMembers.map((item) => (
-        <TeamItem item={item} />
+        <TeamItem item={item} key={item.name} />
       ))}
     </div>
   </section>
 );
 
-const Home = () => (
-  <div className={styles.parent}>
-    <About />
-    <LearnWords />
-    <PlayGames />
-    <Statistics />
-    <Team />
-  </div>
-);
+const Home = () => {
+  const [visibleIdSet, setVisibleIdSet] = useState(new Set(['about']));
+  const [unVisibleIdSet, setUnVisibleIdSet] = useState(new Set<string>());
+
+  const handleScroll = () => {
+    const windowHeight = window.innerHeight;
+    const allSections = Array.from(document.getElementsByTagName('section'));
+    allSections.forEach((section) => {
+      const { top, bottom } = section.getBoundingClientRect();
+      if (top < windowHeight) {
+        if (!visibleIdSet.has(section.id)) {
+          setVisibleIdSet((prev) => new Set([...Array.from(prev), section.id]));
+        }
+      }
+      if (top >= windowHeight - 50) {
+        if (visibleIdSet.has(section.id)) {
+          setVisibleIdSet((prev) => {
+            prev.delete(section.id);
+            return prev;
+          });
+        }
+      }
+      if (bottom <= 61) {
+        if (!unVisibleIdSet.has(section.id)) {
+          setUnVisibleIdSet((prev) => new Set([...Array.from(prev), section.id]));
+        }
+      }
+      if (bottom > 61) {
+        if (unVisibleIdSet.has(section.id)) {
+          setUnVisibleIdSet((prev) => {
+            prev.delete(section.id);
+            return prev;
+          });
+        }
+      }
+    });
+  };
+
+  useEffect(() => window.addEventListener('scroll', handleScroll));
+  return (
+    <div className='w-full h-full bg-gradient-to-br from-slate-600 via-slate-100 via-slate-600 via-slate-200 to-slate-600'>
+      <About id='about' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />
+      <LearnWords id='learnWords' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />
+      <PlayGames id='playGames' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />
+      <Statistics id='statistics' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />
+      <Team id='team' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />
+    </div>
+  );
+};
 
 export default Home;

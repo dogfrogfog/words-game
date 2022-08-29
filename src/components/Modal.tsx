@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LoginForm, RegisterForm } from './LoginRegisterForm';
+import { LoginForm, RegisterForm } from './AuthForm';
 
 interface IModalProps {
   visible: boolean;
@@ -28,8 +28,7 @@ const Modal = ({ visible, onClose }: IModalProps) => {
         onKeyDown={(e) => e.stopPropagation()}
         aria-hidden
       >
-        <LoginForm visible={formActive} onChange={() => setFormActive(false)} />
-        <RegisterForm visible={formActive} onChange={() => setFormActive(true)} />
+        <LoginForm />
       </div>
     </div>
   );

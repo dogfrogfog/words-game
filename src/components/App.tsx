@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Route, ReactLocation, Outlet, Router } from '@tanstack/react-location';
+
 import Routes from 'constants/routes';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
@@ -43,6 +44,7 @@ const App = () => {
     setMenu((prev: boolean) => !prev);
   };
   const handleClose = () => setModalActive(false);
+
   return (
     <Router routes={routes} location={location}>
       <div className='flex flex-col justify-between h-screen pt-[70px] relative'>

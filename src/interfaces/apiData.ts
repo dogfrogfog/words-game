@@ -1,45 +1,45 @@
-export type Auth = {
+export interface IAuth {
   message: string;
   token: string;
   refreshToken: string;
   userId: string;
   name: string;
-};
+}
 
-export type Optional = {
+export interface IOptional {
   learned: boolean;
   correctAnswers: number;
-};
+}
 
-export type Setting = {
+export interface ISetting {
   wordsPerDay: number;
   optional: {
     test: string;
   };
-};
+}
 
-export type Statistic = {
+export interface IStatistic {
   learnedWords: number;
   optional: {
     test: string;
   };
-};
+}
 
-export type User = {
+export interface IUser {
   name: string;
   email: string;
   password: string;
-};
+}
 
-export type UserWord = {
+export interface IUserWord {
   difficulty: string;
   optional: {
     learned: boolean;
     correctAnswers: number;
   };
-};
+}
 
-export type Word = {
+export interface IWord {
   id: string;
   group: number;
   page: number;
@@ -54,4 +54,4 @@ export type Word = {
   wordTranslate: string;
   textMeaningTranslate: string;
   textExampleTranslate: string;
-};
+}

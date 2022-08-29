@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Word, UserWord, Auth, Setting, Statistic, User } from 'types/apiData';
+import { IWord, IUserWord, IAuth, ISetting, IStatistic, IUser } from 'interfaces/apiData';
 import { BASE_URL } from 'constants/constants';
 
 const ApiService = () => {
@@ -24,27 +24,27 @@ const ApiService = () => {
   }: {
     email: string;
     password: string;
-  }): Promise<Auth> => {
-    const result = await api.post<Auth>('signin', {
+  }): Promise<IAuth> => {
+    const result = await api.post<IAuth>('signin', {
       email,
       password,
     });
     return result.data;
   };
 
-  const getNewToken = async (id: string): Promise<Auth> => {
-    const response = await api.get<Auth>(`users/${id}/tokens`);
+  const getNewToken = async (id: string): Promise<IAuth> => {
+    const response = await api.get<IAuth>(`users/${id}/tokens`);
 
     return response.data;
   };
-  const createUser = async (user: User): Promise<User> => {
-    const response = await api.post<User>('users', user);
+  const createUser = async (user: IUser): Promise<IUser> => {
+    const response = await api.post<IUser>('users', user);
 
     return response.data;
   };
 
-  const getUser = async (id: string): Promise<User> => {
-    const response = await api.get<User>(`users/${id}`);
+  const getUser = async (id: string): Promise<IUser> => {
+    const response = await api.get<IUser>(`users/${id}`);
 
     return response.data;
   };
@@ -57,8 +57,8 @@ const ApiService = () => {
     id: string;
     email: string;
     password: string;
-  }): Promise<User> => {
-    const result = await api.put<User>(`users/${id}`, {
+  }): Promise<IUser> => {
+    const result = await api.put<IUser>(`users/${id}`, {
       email,
       password,
     });
@@ -69,31 +69,31 @@ const ApiService = () => {
   const deleteUser = async (id: string): Promise<void> =>
     api.delete<void>(`users/${id}`).then((result) => result.data);
 
-  const getWords = async (group: string, page: string): Promise<Word[]> => {
-    const result = await api.get<Word[]>('words', {
+  const getWords = async (group: string, page: string) => {
+    const response = await api.get<IWord[]>('words', {
       params: {
         group,
         page,
       },
     });
 
-    return result.data;
+    return response.data;
   };
 
-  const getWord = async (id: string): Promise<Word> => {
-    const response = await api.get<Word>(`words/${id}`);
+  const getWord = async (id: string): Promise<IWord> => {
+    const response = await api.get<IWord>(`words/${id}`);
 
     return response.data;
   };
 
-  const getAllUserWords = async (userId: string): Promise<UserWord[]> => {
-    const response = await api.get<UserWord[]>(`words/${userId}`);
+  const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
+    const response = await api.get<IUserWord[]>(`words/${userId}`);
 
     return response.data;
   };
 
-  const getUserWord = async (userId: string, wordId: string): Promise<UserWord> => {
-    const response = await api.get<UserWord>(`users/${userId}/words/${wordId}`);
+  const getUserWord = async (userId: string, wordId: string): Promise<IUserWord> => {
+    const response = await api.get<IUserWord>(`users/${userId}/words/${wordId}`);
     return response.data;
   };
 
@@ -104,9 +104,9 @@ const ApiService = () => {
   }: {
     userId: string;
     wordId: string;
-    userWord: UserWord;
-  }): Promise<UserWord> => {
-    const response = await api.post<UserWord>(`users/${userId}/words/${wordId}`, userWord);
+    userWord: IUserWord;
+  }): Promise<IUserWord> => {
+    const response = await api.post<IUserWord>(`users/${userId}/words/${wordId}`, userWord);
 
     return response.data;
   };
@@ -118,9 +118,9 @@ const ApiService = () => {
   }: {
     userId: string;
     wordId: string;
-    userWord: UserWord;
-  }): Promise<UserWord> => {
-    const response = await api.put<UserWord>(`users/${userId}/words/${wordId}`, userWord);
+    userWord: IUserWord;
+  }): Promise<IUserWord> => {
+    const response = await api.put<IUserWord>(`users/${userId}/words/${wordId}`, userWord);
 
     return response.data;
   };
@@ -137,8 +137,8 @@ const ApiService = () => {
     return response.data;
   };
 
-  const getSettings = async (userId: string): Promise<Setting> => {
-    const response = await api.get<Setting>(`users/${userId}/settings`);
+  const getSettings = async (userId: string): Promise<ISetting> => {
+    const response = await api.get<ISetting>(`users/${userId}/settings`);
 
     return response.data;
   };
@@ -148,15 +148,15 @@ const ApiService = () => {
     setting,
   }: {
     userId: string;
-    setting: Setting;
-  }): Promise<Setting> => {
-    const response = await api.put<Setting>(`users/${userId}/settings`, setting);
+    setting: ISetting;
+  }): Promise<ISetting> => {
+    const response = await api.put<ISetting>(`users/${userId}/settings`, setting);
 
     return response.data;
   };
 
-  const getStatictics = async (userId: string): Promise<Statistic> => {
-    const response = await api.get<Statistic>(`/users/${userId}/statistics`);
+  const getStatictics = async (userId: string): Promise<IStatistic> => {
+    const response = await api.get<IStatistic>(`/users/${userId}/statistics`);
 
     return response.data;
   };
@@ -165,9 +165,9 @@ const ApiService = () => {
     setting,
   }: {
     userId: string;
-    setting: Setting;
-  }): Promise<Statistic> => {
-    const response = await api.put<Statistic>(`/users/${userId}/statistics`, setting);
+    setting: ISetting;
+  }): Promise<IStatistic> => {
+    const response = await api.put<IStatistic>(`/users/${userId}/statistics`, setting);
 
     return response.data;
   };
@@ -193,6 +193,6 @@ const ApiService = () => {
   };
 };
 
-const api = ApiService();
+const API = ApiService();
 
-export default api;
+export default API;

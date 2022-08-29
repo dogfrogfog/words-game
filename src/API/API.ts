@@ -1,50 +1,53 @@
 import axios from 'axios';
+import { Word, UserWord, Auth, Setting, Statistic, User } from 'types/apiData';
 import { BASE_URL } from 'constants/constants';
-import { IUser } from 'interfaces/User.interface';
-import { IAuth } from 'interfaces/Auth.interface';
-import { ISetting } from 'interfaces/Setting.interface';
-import { IStatistic } from 'interfaces/Statictic.interface';
-import { IUserWord } from 'interfaces/UserWord.interface';
-import { IWord } from 'interfaces/Word.interface';
 
-const api = axios.create({
-  baseURL: BASE_URL,
-});
+const ApiService = () => {
+  const api = axios.create({
+    baseURL: BASE_URL,
+  });
 
-api.interceptors.request.use((config) => {
-  const requestConfig = config;
-  const token = localStorage.getItem('token');
+  api.interceptors.request.use((config) => {
+    const requestConfig = config;
+    const token = localStorage.getItem('token');
 
-  if (requestConfig.headers && token) {
-    requestConfig.headers.Authorization = `Bearer ${token}`;
-  }
+    if (requestConfig.headers && token) {
+      requestConfig.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return config;
-});
+    return config;
+  });
 
-const apiService = () => {
   const signIn = async ({
     email,
     password,
   }: {
     email: string;
     password: string;
-  }): Promise<IAuth> => {
-    const result = await api.post<IAuth>('signin', {
+  }): Promise<Auth> => {
+    const result = await api.post<Auth>('signin', {
       email,
       password,
     });
     return result.data;
   };
 
-  const getNewToken = async (id: string): Promise<IAuth> =>
-    api.get<IAuth>(`users/${id}/tokens`).then((result) => result.data);
+  const getNewToken = async (id: string): Promise<Auth> => {
+    const response = await api.get<Auth>(`users/${id}/tokens`);
 
-  const createUser = async (user: IUser): Promise<IUser> =>
-    api.post<IUser>('users', user).then((result) => result.data);
+    return response.data;
+  };
+  const createUser = async (user: User): Promise<User> => {
+    const response = await api.post<User>('users', user);
 
-  const getUser = async (id: string): Promise<IUser> =>
-    api.get<IUser>(`users/${id}`).then((result) => result.data);
+    return response.data;
+  };
+
+  const getUser = async (id: string): Promise<User> => {
+    const response = await api.get<User>(`users/${id}`);
+
+    return response.data;
+  };
 
   const updateUser = async ({
     id,
@@ -54,35 +57,45 @@ const apiService = () => {
     id: string;
     email: string;
     password: string;
-  }): Promise<IUser> =>
-    api
-      .put<IUser>(`users/${id}`, {
-        email,
-        password,
-      })
-      .then((result) => result.data);
+  }): Promise<User> => {
+    const result = await api.put<User>(`users/${id}`, {
+      email,
+      password,
+    });
+
+    return result.data;
+  };
 
   const deleteUser = async (id: string): Promise<void> =>
     api.delete<void>(`users/${id}`).then((result) => result.data);
 
-  const getWords = async (group: string, page: string): Promise<IWord[]> =>
-    api
-      .get<IWord[]>('words', {
-        params: {
-          group,
-          page,
-        },
-      })
-      .then((result) => result.data);
+  const getWords = async (group: string, page: string): Promise<Word[]> => {
+    const result = await api.get<Word[]>('words', {
+      params: {
+        group,
+        page,
+      },
+    });
 
-  const getWord = async (id: string): Promise<IWord> =>
-    api.get<IWord>(`words/${id}`).then((result) => result.data);
+    return result.data;
+  };
 
-  const getAllUserWords = async (userId: string): Promise<IUserWord[]> =>
-    api.get<IUserWord[]>(`words/${userId}`).then((result) => result.data);
+  const getWord = async (id: string): Promise<Word> => {
+    const response = await api.get<Word>(`words/${id}`);
 
-  const getUserWord = async (userId: string, wordId: string): Promise<IUserWord> =>
-    api.get<IUserWord>(`users/${userId}/words/${wordId}`).then((result) => result.data);
+    return response.data;
+  };
+
+  const getAllUserWords = async (userId: string): Promise<UserWord[]> => {
+    const response = await api.get<UserWord[]>(`words/${userId}`);
+
+    return response.data;
+  };
+
+  const getUserWord = async (userId: string, wordId: string): Promise<UserWord> => {
+    const response = await api.get<UserWord>(`users/${userId}/words/${wordId}`);
+    return response.data;
+  };
 
   const createUserWord = async ({
     userId,
@@ -91,9 +104,12 @@ const apiService = () => {
   }: {
     userId: string;
     wordId: string;
-    userWord: IUserWord;
-  }): Promise<IUserWord> =>
-    api.post<IUserWord>(`users/${userId}/words/${wordId}`, userWord).then((result) => result.data);
+    userWord: UserWord;
+  }): Promise<UserWord> => {
+    const response = await api.post<UserWord>(`users/${userId}/words/${wordId}`, userWord);
+
+    return response.data;
+  };
 
   const updateUserWord = async ({
     userId,
@@ -102,9 +118,12 @@ const apiService = () => {
   }: {
     userId: string;
     wordId: string;
-    userWord: IUserWord;
-  }): Promise<IUserWord> =>
-    api.put<IUserWord>(`users/${userId}/words/${wordId}`, userWord).then((result) => result.data);
+    userWord: UserWord;
+  }): Promise<UserWord> => {
+    const response = await api.put<UserWord>(`users/${userId}/words/${wordId}`, userWord);
+
+    return response.data;
+  };
 
   const deleteUserWord = async ({
     userId,
@@ -112,32 +131,46 @@ const apiService = () => {
   }: {
     userId: string;
     wordId: string;
-  }): Promise<void> =>
-    api.delete<void>(`users/${userId}/words/${wordId}`).then((result) => result.data);
+  }): Promise<void> => {
+    const response = await api.delete<void>(`users/${userId}/words/${wordId}`);
 
-  const getSettings = async (userId: string): Promise<ISetting> =>
-    api.get<ISetting>(`users/${userId}/settings`).then((result) => result.data);
+    return response.data;
+  };
+
+  const getSettings = async (userId: string): Promise<Setting> => {
+    const response = await api.get<Setting>(`users/${userId}/settings`);
+
+    return response.data;
+  };
 
   const updateSettings = async ({
     userId,
     setting,
   }: {
     userId: string;
-    setting: ISetting;
-  }): Promise<ISetting> =>
-    api.put<ISetting>(`users/${userId}/settings`, setting).then((result) => result.data);
+    setting: Setting;
+  }): Promise<Setting> => {
+    const response = await api.put<Setting>(`users/${userId}/settings`, setting);
 
-  const getStatictics = async (userId: string): Promise<IStatistic> =>
-    api.get<IStatistic>(`/users/${userId}/statistics`).then((result) => result.data);
+    return response.data;
+  };
 
+  const getStatictics = async (userId: string): Promise<Statistic> => {
+    const response = await api.get<Statistic>(`/users/${userId}/statistics`);
+
+    return response.data;
+  };
   const updateStatictics = async ({
     userId,
     setting,
   }: {
     userId: string;
-    setting: ISetting;
-  }): Promise<IStatistic> =>
-    api.put<IStatistic>(`/users/${userId}/statistics`, setting).then((result) => result.data);
+    setting: Setting;
+  }): Promise<Statistic> => {
+    const response = await api.put<Statistic>(`/users/${userId}/statistics`, setting);
+
+    return response.data;
+  };
 
   return {
     signIn,
@@ -160,6 +193,6 @@ const apiService = () => {
   };
 };
 
-const API = apiService();
+const api = ApiService();
 
-export default API;
+export default api;

@@ -35,7 +35,7 @@
     "eol-last": "error",
     "jsx-quotes": ["error", "prefer-single"],
     "implicit-arrow-linebreak": "off",
-    "@typescript-eslint/indent": "warn",
+    "import/prefer-default-export": "off",
     "object-curly-newline": [
       "error",
       {

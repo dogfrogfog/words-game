@@ -52,7 +52,7 @@ interface ISectionsProps {
   unVisibleIdSet: Set<string>;
 }
 
-const showSections = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => {
+const showHideSections = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => {
   if (unVisibleIdSet.has(id)) return 'opacity-0 -translate-y-[200px]';
   if (visibleIdSet.has(id)) return '';
   return 'opacity-0 translate-y-[200px]';
@@ -61,11 +61,13 @@ const showSections = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => {
 const About = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
   <section
     id='about'
-    className={`bg-about-bg ${styles.section}  bg-center  bg-cover bg-no-repeat  ${showSections({
-      visibleIdSet,
-      id,
-      unVisibleIdSet,
-    })}`}
+    className={`bg-about-bg ${styles.section}  bg-center  bg-cover bg-no-repeat  ${showHideSections(
+      {
+        visibleIdSet,
+        id,
+        unVisibleIdSet,
+      },
+    )}`}
   >
     <h2 className='text-7xl mx-auto text-center font-bold'>
       <span className='text-yellow-700'>R</span>
@@ -86,7 +88,7 @@ const About = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
 const LearnWords = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
   <section
     id='learnWords'
-    className={`bg-wordbook-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+    className={`bg-wordbook-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showHideSections({
       visibleIdSet,
       id,
       unVisibleIdSet,
@@ -130,7 +132,9 @@ const LearnWords = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
 const PlayGames = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
   <section
     id='playGames'
-    className={`bg-game-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+    className={`bg-game-bg ${
+      styles.section
+    } pb-[20px] bg-right bg-cover bg-no-repeat ${showHideSections({
       visibleIdSet,
       id,
       unVisibleIdSet,
@@ -191,7 +195,9 @@ const PlayGames = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
 const Statistics = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
   <section
     id='statistics'
-    className={`bg-statistics-bg ${styles.section} bg-right bg-cover bg-no-repeat ${showSections({
+    className={`bg-statistics-bg ${
+      styles.section
+    } bg-right bg-cover bg-no-repeat ${showHideSections({
       visibleIdSet,
       id,
       unVisibleIdSet,
@@ -252,7 +258,7 @@ const Team = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
     id='team'
     className={`bg-gradient-to-br from-zinc-400 via-zinc-100 to-zinc-400 ${
       styles.section
-    } ${showSections({
+    } ${showHideSections({
       visibleIdSet,
       id,
       unVisibleIdSet,
@@ -286,7 +292,7 @@ const Home = () => {
           setVisibleIdSet((prev) => new Set([...Array.from(prev), section.id]));
         }
       }
-      if (top >= windowHeight - 50) {
+      if (top >= windowHeight - 100) {
         if (visibleIdSet.has(section.id)) {
           setVisibleIdSet((prev) => {
             prev.delete(section.id);

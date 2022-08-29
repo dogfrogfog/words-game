@@ -51,7 +51,7 @@ const App = () => {
           menuState={isMenuOpen}
           toggleMenu={toggleMenu}
         />
-        <main className='flex justify-between pr-2 h-full'>
+        <main className='flex justify-between pr-2'>
           <Sidebar menuState={isMenuOpen} />
           <Outlet />
         </main>

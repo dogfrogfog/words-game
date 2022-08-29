@@ -34,7 +34,8 @@
     ],
     "eol-last": "error",
     "jsx-quotes": ["error", "prefer-single"],
-
+    "implicit-arrow-linebreak": "off",
+    "@typescript-eslint/indent": "warn",
     "object-curly-newline": [
       "error",
       {

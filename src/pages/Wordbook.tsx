@@ -1,5 +1,5 @@
 import PageTitle from 'components/PageTitle';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createRef } from 'react';
 
 interface IWord {
   id: string;
@@ -27,18 +27,33 @@ interface IWordsProps {
   page: number;
 }
 
-const GroupSelector = () => (
-  <div className='pl-1 pr-1'>
-    <select id='group'>
-      <option value='0'>Раздел 1</option>
-      <option value='1'>Раздел 2</option>
-      <option value='2'>Раздел 3</option>
-      <option value='3'>Раздел 4</option>
-      <option value='4'>Раздел 5</option>
-      <option value='5'>Раздел 6</option>
-    </select>
-  </div>
-);
+interface IControlBarProps {
+  changeGroup: React.Dispatch<React.SetStateAction<number>>;
+}
+
+interface IGroupSelectorProps {
+  changeGroup: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
+  const selectRef = createRef<HTMLSelectElement>();
+  const handleChange = () => {
+    changeGroup(+(selectRef.current as HTMLSelectElement).value);
+  };
+
+  return (
+    <div className='pl-1 pr-1'>
+      <select id='group' onChange={handleChange} ref={selectRef}>
+        <option value='0'>Раздел 1</option>
+        <option value='1'>Раздел 2</option>
+        <option value='2'>Раздел 3</option>
+        <option value='3'>Раздел 4</option>
+        <option value='4'>Раздел 5</option>
+        <option value='5'>Раздел 6</option>
+      </select>
+    </div>
+  );
+};
 
 const Pagination = () => (
   <div className='pl-1 pr-1'>
@@ -54,9 +69,9 @@ const Pagination = () => (
 
 const Options = () => <div className='pl-1 pr-1'>select options</div>;
 
-const NavBlock = () => (
+const ControlBar = ({ changeGroup }: IControlBarProps) => (
   <div className='flex'>
-    <GroupSelector />
+    <GroupSelector changeGroup={changeGroup} />
     <Pagination />
     <Options />
   </div>
@@ -77,8 +92,10 @@ const WordsList = ({ group, page }: IWordsProps) => {
     fetch(src)
       .then((response) => response.json())
       .then((wordsArray: IWord[]) => setWords(wordsArray))
-      .catch((e) => console.log(e));
-  });
+      .catch((e: string) => {
+        throw new Error(e);
+      });
+  }, [src]);
 
   return (
     <div>
@@ -91,12 +108,15 @@ const WordsList = ({ group, page }: IWordsProps) => {
   );
 };
 
-const Wordbook = () => (
-  <div className='py-2 px-2 w-full'>
-    <PageTitle>Wordbook</PageTitle>
-    <NavBlock />
-    <WordsList group={0} page={0} />
-  </div>
-);
+const Wordbook = () => {
+  const [groupNum, setGroupNum] = useState(0);
+  return (
+    <div className='py-2 px-2 w-full'>
+      <PageTitle>Wordbook</PageTitle>
+      <ControlBar changeGroup={setGroupNum} />
+      <WordsList group={groupNum} page={0} />
+    </div>
+  );
+};
 
 export default Wordbook;

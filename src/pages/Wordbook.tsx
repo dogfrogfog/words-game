@@ -29,10 +29,17 @@ interface IWordsProps {
 
 interface IControlBarProps {
   changeGroup: React.Dispatch<React.SetStateAction<number>>;
+  changePage: React.Dispatch<React.SetStateAction<number>>;
+  page: number;
 }
 
 interface IGroupSelectorProps {
   changeGroup: React.Dispatch<React.SetStateAction<number>>;
+}
+
+interface IPaginationProps {
+  changePage: React.Dispatch<React.SetStateAction<number>>;
+  page: number;
 }
 
 const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
@@ -55,24 +62,41 @@ const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
   );
 };
 
-const Pagination = () => (
-  <div className='pl-1 pr-1'>
-    <button type='button' className='bg-blue-400 leading-4 p-1 rounded'>
-      prev
-    </button>
-    <span className='p-1'>current</span>
-    <button type='button' className='bg-blue-400 leading-4 p-1 rounded'>
-      next
-    </button>
-  </div>
-);
+const Pagination = ({ changePage, page }: IPaginationProps) => {
+  const [pageNum, setPageNum] = useState(page);
+  const decreasePage = () => {
+    if (pageNum > 0) {
+      setPageNum(pageNum - 1);
+      changePage(pageNum - 1);
+    }
+  };
+
+  const increasePage = () => {
+    if (page < 29) {
+      setPageNum(pageNum + 1);
+      changePage(pageNum + 1);
+    }
+  };
+
+  return (
+    <div className='pl-1 pr-1'>
+      <button onClick={decreasePage} type='button' className='bg-blue-400 leading-4 p-1 rounded'>
+        prev
+      </button>
+      <span className='p-1'>{pageNum + 1}</span>
+      <button onClick={increasePage} type='button' className='bg-blue-400 leading-4 p-1 rounded'>
+        next
+      </button>
+    </div>
+  );
+};
 
 const Options = () => <div className='pl-1 pr-1'>select options</div>;
 
-const ControlBar = ({ changeGroup }: IControlBarProps) => (
+const ControlBar = ({ changeGroup, changePage, page }: IControlBarProps) => (
   <div className='flex'>
     <GroupSelector changeGroup={changeGroup} />
-    <Pagination />
+    <Pagination changePage={changePage} page={page} />
     <Options />
   </div>
 );
@@ -110,11 +134,13 @@ const WordsList = ({ group, page }: IWordsProps) => {
 
 const Wordbook = () => {
   const [groupNum, setGroupNum] = useState(0);
+  const [pageNum, setPageNum] = useState(0);
+
   return (
     <div className='py-2 px-2 w-full'>
       <PageTitle>Wordbook</PageTitle>
-      <ControlBar changeGroup={setGroupNum} />
-      <WordsList group={groupNum} page={0} />
+      <ControlBar changeGroup={setGroupNum} changePage={setPageNum} page={pageNum} />
+      <WordsList group={groupNum} page={pageNum} />
     </div>
   );
 };

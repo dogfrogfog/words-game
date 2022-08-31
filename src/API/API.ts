@@ -69,7 +69,7 @@ const ApiService = () => {
   const deleteUser = async (id: string): Promise<void> =>
     api.delete<void>(`users/${id}`).then((result) => result.data);
 
-  const getWords = async (group: string, page: string) => {
+  const getWords = async (group: number, page: number) => {
     const response = await api.get<IWord[]>('words', {
       params: {
         group,

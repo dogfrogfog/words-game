@@ -1,5 +1,6 @@
 import PageTitle from 'components/PageTitle';
 import { useEffect, useState, createRef } from 'react';
+import API from 'API/API';
 import playImg from '../assets/png/play-button.png';
 import pauseImg from '../assets/png/pause-button.png';
 
@@ -185,24 +186,21 @@ const Word = ({ word }: IWordProps) => {
 };
 
 const WordsList = ({ group, page }: IWordsProps) => {
-  const src = `
-  https://react-learnwords-example.herokuapp.com/words?group=${group}&page=${page}`;
   const [words, setWords] = useState<IWord[]>([]);
   useEffect(() => {
-    fetch(src)
-      .then((response) => response.json())
-      .then((wordsArray: IWord[]) => setWords(wordsArray))
+    API.getWords(group, page)
+      .then((wordsArray) => setWords(wordsArray))
       .catch((e: string) => {
         throw new Error(e);
       });
-  }, [src]);
+  }, [group, page]);
 
   return (
     <div className='pl-2 pr-2'>
-      {words.length ? (
+      {words.length === 20 ? (
         words.map((word) => <Word word={word} key={word.id} />)
       ) : (
-        <img className='w-14' src='https://i.gifer.com/ZZ5H.gif' alt='loader' />
+        <img className='w-20 block mx-auto ' src='https://i.gifer.com/ZZ5H.gif' alt='loader' />
       )}
     </div>
   );

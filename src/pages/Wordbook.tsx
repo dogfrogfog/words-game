@@ -1,39 +1,27 @@
 import PageTitle from 'components/PageTitle';
 import { useEffect, useState, createRef } from 'react';
 import API from 'API/API';
+import { IWord } from 'interfaces/apiData';
 import playImg from '../assets/png/play-button.png';
 import pauseImg from '../assets/png/pause-button.png';
 
-interface IWord {
-  id: string;
-  group: number;
-  page: number;
-  word: string;
-  image: string;
-  audio: string;
-  audioMeaning: string;
-  audioExample: string;
-  textMeaning: string;
-  textExample: string;
-  transcription: string;
-  wordTranslate: string;
-  textMeaningTranslate: string;
-  textExampleTranslate: string;
-}
-
 interface IWordProps {
   word: IWord;
+  translate: boolean;
 }
 
-interface IWordsProps {
+interface IWordsListProps {
   group: number;
   page: number;
+  translate: boolean;
 }
 
 interface IControlBarProps {
   changeGroup: React.Dispatch<React.SetStateAction<number>>;
   changePage: React.Dispatch<React.SetStateAction<number>>;
+  changeTranslate: React.Dispatch<React.SetStateAction<boolean>>;
   page: number;
+  translate: boolean;
 }
 
 interface IGroupSelectorProps {
@@ -43,6 +31,11 @@ interface IGroupSelectorProps {
 interface IPaginationProps {
   changePage: React.Dispatch<React.SetStateAction<number>>;
   page: number;
+}
+
+interface IOptionsProps {
+  changeTranslate: React.Dispatch<React.SetStateAction<boolean>>;
+  showTranslate: boolean;
 }
 
 const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
@@ -122,17 +115,34 @@ const Pagination = ({ changePage, page }: IPaginationProps) => {
   );
 };
 
-const Options = () => <div className='pl-2 pr-2'>select options</div>;
+const Options = ({ changeTranslate, showTranslate }: IOptionsProps) => {
+  const handleChange = () => changeTranslate(!showTranslate);
 
-const ControlBar = ({ changeGroup, changePage, page }: IControlBarProps) => (
+  return (
+    <div>
+      <label htmlFor='options'>
+        <input type='checkbox' id='options' className='mr-2' onChange={handleChange} />
+        Скрыть перевод
+      </label>
+    </div>
+  );
+};
+
+const ControlBar = ({
+  changeGroup,
+  changePage,
+  changeTranslate,
+  page,
+  translate,
+}: IControlBarProps) => (
   <div className='flex mb-4 mt-4 text-xl flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
     <GroupSelector changeGroup={changeGroup} />
     <Pagination changePage={changePage} page={page} />
-    <Options />
+    <Options changeTranslate={changeTranslate} showTranslate={translate} />
   </div>
 );
 
-const Word = ({ word }: IWordProps) => {
+const Word = ({ word, translate }: IWordProps) => {
   const groupColors = [
     'bg-[#b1d9a3]',
     'bg-[#cbe8be]',
@@ -141,7 +151,8 @@ const Word = ({ word }: IWordProps) => {
     'bg-[#ffcccb]',
     'bg-[#fcbaba]',
   ];
-  const subTextStyle = 'text-[15px] text-slate-600 italic';
+  const visibilityClass = translate ? ' hidden' : '';
+  const subTextStyle = `text-[15px] text-slate-600 italic ${visibilityClass}`;
   const [playMeaning, setPlayMeaning] = useState(false);
   const [playExample, setPlayExample] = useState(false);
   const handlePlayMean = () => setPlayMeaning(!playMeaning);
@@ -151,29 +162,27 @@ const Word = ({ word }: IWordProps) => {
     <div
       className={`p-3 mb-4 text-lg rounded shadow-lg shadow-slate-300 ${groupColors[word.group]}`}
     >
-      <div className={`h-40 bg-[url('/${word.image})]`} />
+      <div className={`h-40 bg-[url('${word.image})]`} />
       <p className='mb-2 font-bold text-center'>
         {`${word.word} - ${word.transcription} - ${word.wordTranslate}`}
       </p>
       <div className='flex flex-col justify-between md:flex-row'>
-        <div className='w-[100%] md:w-[50%]'>
+        <div className='w-[100%] md:w-[48%]'>
           <button type='button' onClick={handlePlayMean}>
             <img src={playMeaning ? pauseImg : playImg} alt='player controls' className='h-6' />
           </button>
           <p
-            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: word.textMeaning,
             }}
           />
           <p className={`${subTextStyle} mb-2`}>{word.textMeaningTranslate}</p>
         </div>
-        <div className='w-[100%] md:w-[50%]'>
+        <div className='w-[100%] md:w-[48%]'>
           <button type='button' onClick={handlePlayExam}>
             <img src={playExample ? pauseImg : playImg} alt='player controls' className='h-6' />
           </button>
           <p
-            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: word.textExample,
             }}
@@ -185,7 +194,7 @@ const Word = ({ word }: IWordProps) => {
   );
 };
 
-const WordsList = ({ group, page }: IWordsProps) => {
+const WordsList = ({ group, page, translate }: IWordsListProps) => {
   const [words, setWords] = useState<IWord[]>([]);
   useEffect(() => {
     API.getWords(group, page)
@@ -198,7 +207,7 @@ const WordsList = ({ group, page }: IWordsProps) => {
   return (
     <div className='pl-2 pr-2'>
       {words.length === 20 ? (
-        words.map((word) => <Word word={word} key={word.id} />)
+        words.map((word) => <Word word={word} key={word.id} translate={translate} />)
       ) : (
         <img className='w-20 block mx-auto ' src='https://i.gifer.com/ZZ5H.gif' alt='loader' />
       )}
@@ -209,12 +218,19 @@ const WordsList = ({ group, page }: IWordsProps) => {
 const Wordbook = () => {
   const [groupNum, setGroupNum] = useState(0);
   const [pageNum, setPageNum] = useState(0);
+  const [showTranslate, setShowTranslate] = useState(false);
 
   return (
     <div className='py-2 px-2 w-full'>
       <PageTitle>Wordbook</PageTitle>
-      <ControlBar changeGroup={setGroupNum} changePage={setPageNum} page={pageNum} />
-      <WordsList group={groupNum} page={pageNum} />
+      <ControlBar
+        changeGroup={setGroupNum}
+        changePage={setPageNum}
+        changeTranslate={setShowTranslate}
+        page={pageNum}
+        translate={showTranslate}
+      />
+      <WordsList group={groupNum} page={pageNum} translate={showTranslate} />
     </div>
   );
 };

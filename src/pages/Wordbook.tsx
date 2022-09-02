@@ -4,6 +4,7 @@ import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
 import playImg from '../assets/png/play-button.png';
 import pauseImg from '../assets/png/pause-button.png';
+import { BASE_URL } from '../constants/constants';
 
 interface IWordProps {
   word: IWord;
@@ -135,7 +136,7 @@ const ControlBar = ({
   page,
   translate,
 }: IControlBarProps) => (
-  <div className='flex mb-4 mt-4 text-xl flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
+  <div className='flex mb-4 mt-4 text-xl text-center flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
     <GroupSelector changeGroup={changeGroup} />
     <Pagination changePage={changePage} page={page} />
     <Options changeTranslate={changeTranslate} showTranslate={translate} />
@@ -162,7 +163,11 @@ const Word = ({ word, translate }: IWordProps) => {
     <div
       className={`p-3 mb-4 text-lg rounded shadow-lg shadow-slate-300 ${groupColors[word.group]}`}
     >
-      <div className={`h-40 bg-[url('${word.image})]`} />
+      <img
+        src={`${BASE_URL}${word.image}`}
+        alt={`${word.word}`}
+        className='mx-auto rounded shadow-md shadow-black mb-2'
+      />
       <p className='mb-2 font-bold text-center'>
         {`${word.word} - ${word.transcription} - ${word.wordTranslate}`}
       </p>

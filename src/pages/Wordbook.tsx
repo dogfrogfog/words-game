@@ -39,6 +39,49 @@ interface IOptionsProps {
   showTranslate: boolean;
 }
 
+interface IWordBlockProps {
+  audio: string;
+  example: string;
+  translate: string;
+  isTranslate: boolean;
+}
+
+const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) => {
+  const visibilityClass = isTranslate ? ' hidden' : '';
+  const subTextStyle = `text-[15px] text-slate-600 italic ${visibilityClass}`;
+  const audioEl = createRef<HTMLAudioElement>();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const handleClick = () => setIsPlaying(!isPlaying);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      (audioEl.current as HTMLAudioElement).pause();
+    } else {
+      (audioEl.current as HTMLAudioElement).play().catch((e: string) => {
+        throw new Error(e);
+      });
+    }
+  }, [isPlaying, audioEl]);
+
+  return (
+    <div className='w-[100%] md:w-[48%]'>
+      <audio ref={audioEl} onEnded={handleClick}>
+        <source src={`${BASE_URL}${audio}`} />
+        <track kind='captions' />
+      </audio>
+      <button type='button' onClick={handleClick}>
+        <img src={isPlaying ? pauseImg : playImg} alt='player controls' className='h-6' />
+      </button>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: example,
+        }}
+      />
+      <p className={`${subTextStyle} mb-2`}>{translate}</p>
+    </div>
+  );
+};
+
 const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
   const selectRef = createRef<HTMLSelectElement>();
   const handleChange = () => {
@@ -152,12 +195,6 @@ const Word = ({ word, translate }: IWordProps) => {
     'bg-[#ffcccb]',
     'bg-[#fcbaba]',
   ];
-  const visibilityClass = translate ? ' hidden' : '';
-  const subTextStyle = `text-[15px] text-slate-600 italic ${visibilityClass}`;
-  const [playMeaning, setPlayMeaning] = useState(false);
-  const [playExample, setPlayExample] = useState(false);
-  const handlePlayMean = () => setPlayMeaning(!playMeaning);
-  const handlePlayExam = () => setPlayExample(!playExample);
 
   return (
     <div
@@ -172,28 +209,18 @@ const Word = ({ word, translate }: IWordProps) => {
         {`${word.word} - ${word.transcription} - ${word.wordTranslate}`}
       </p>
       <div className='flex flex-col justify-between md:flex-row'>
-        <div className='w-[100%] md:w-[48%]'>
-          <button type='button' onClick={handlePlayMean}>
-            <img src={playMeaning ? pauseImg : playImg} alt='player controls' className='h-6' />
-          </button>
-          <p
-            dangerouslySetInnerHTML={{
-              __html: word.textMeaning,
-            }}
-          />
-          <p className={`${subTextStyle} mb-2`}>{word.textMeaningTranslate}</p>
-        </div>
-        <div className='w-[100%] md:w-[48%]'>
-          <button type='button' onClick={handlePlayExam}>
-            <img src={playExample ? pauseImg : playImg} alt='player controls' className='h-6' />
-          </button>
-          <p
-            dangerouslySetInnerHTML={{
-              __html: word.textExample,
-            }}
-          />
-          <p className={subTextStyle}>{word.textExampleTranslate}</p>
-        </div>
+        <WordBlock
+          audio={word.audioMeaning}
+          example={word.textMeaning}
+          translate={word.textMeaningTranslate}
+          isTranslate={translate}
+        />
+        <WordBlock
+          audio={word.audioExample}
+          example={word.textExample}
+          translate={word.textExampleTranslate}
+          isTranslate={translate}
+        />
       </div>
     </div>
   );

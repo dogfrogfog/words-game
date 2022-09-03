@@ -1,4 +1,4 @@
-export enum KindForm {
+export const enum KindForm {
   LOGIN = 'login',
   REGISTRATION = 'regisrtation',
 }

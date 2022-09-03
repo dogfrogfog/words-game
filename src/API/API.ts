@@ -18,16 +18,10 @@ const ApiService = () => {
 
       return config;
     },
-    (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        return error;
-      }
-
-      return error;
-    },
+    (error: AxiosError) => error,
   );
 
-  const signIn = async ({
+  const logIn = async ({
     email,
     password,
   }: {
@@ -56,7 +50,7 @@ const ApiService = () => {
 
     const { email, password } = user;
 
-    const result = await signIn({
+    const result = await logIn({
       email,
       password,
     });
@@ -194,7 +188,7 @@ const ApiService = () => {
   };
 
   return {
-    signIn,
+    logIn,
     createUser,
     getUser,
     getNewToken,

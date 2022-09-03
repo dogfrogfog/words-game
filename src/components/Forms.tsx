@@ -1,39 +1,12 @@
-import { DetailedHTMLProps, InputHTMLAttributes, forwardRef, ReactNode } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useLogin from 'hooks/useLogin';
 import useRegistration from 'hooks/useRegistation';
 import { formLoginSchema, formRegSchema } from 'schemas/formShemas';
 import { KindForm } from 'constants/kindForm';
-import { AxiosError } from 'axios';
+import { useContext } from 'react';
+import { Context } from 'context/context';
 import Spinner from './Spinner';
-
-type InputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-
-const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
-  <input
-    ref={ref}
-    {...props}
-    className='block
-        my-3
-        border-blue-400
-         border-2
-        p-2
-        w-[100%]
-         '
-  />
-));
-
-const Field = ({ children }: { children: ReactNode }) => <div className='my-3'>{children}</div>;
-
-const ButtonSubmit = ({ isValid }: { isValid: boolean }) => (
-  <input
-    type='submit'
-    disabled={isValid}
-    className='text-xl bg-blue-400 px-3 py-2 transition-colors hover:bg-blue-500 cursor-pointer block mx-auto disabled:bg-blue-200 '
-    value='Submit'
-  />
-);
 
 export type FormInputs = {
   username?: string;
@@ -42,7 +15,12 @@ export type FormInputs = {
   confirm?: string;
 };
 
-const Form = ({ typeForm }: { typeForm: string }) => {
+interface IFormProps {
+  typeForm: string;
+  onClose: () => void;
+}
+
+const Form = ({ typeForm, onClose }: IFormProps) => {
   const {
     register,
     handleSubmit,
@@ -53,8 +31,20 @@ const Form = ({ typeForm }: { typeForm: string }) => {
     resolver: zodResolver(typeForm === KindForm.LOGIN ? formLoginSchema : formRegSchema),
   });
 
-  const { mutate: regisrtation, isLoading: isRegLoading, error: regError } = useRegistration();
-  const { mutate: login, isLoading: isLoginLoading, error: loginError } = useLogin();
+  const { state, dispatch } = useContext(Context);
+
+  const {
+    mutate: regisrtation,
+    isLoading: isRegLoading,
+    error: regError,
+    isSuccess: isSuccessReg,
+  } = useRegistration(dispatch);
+  const {
+    mutate: login,
+    isLoading: isLoginLoading,
+    error: loginError,
+    isSuccess: isSuccessLogin,
+  } = useLogin(dispatch);
 
   const error = loginError || regError;
 
@@ -65,11 +55,11 @@ const Form = ({ typeForm }: { typeForm: string }) => {
         password,
         email,
       });
+      reset({
+        password: '',
+        confirm: '',
+      });
     }
-    reset({
-      password: '',
-      confirm: '',
-    });
   };
 
   const onLogin: SubmitHandler<FormInputs> = ({ email, password }) => {
@@ -77,9 +67,14 @@ const Form = ({ typeForm }: { typeForm: string }) => {
       password,
       email,
     });
-    reset({
-      password: '',
-    });
+
+    if (isSuccessLogin) {
+      onClose();
+    } else {
+      reset({
+        password: '',
+      });
+    }
   };
 
   const onSubmit = typeForm === KindForm.LOGIN ? onLogin : onRegistration;
@@ -88,29 +83,48 @@ const Form = ({ typeForm }: { typeForm: string }) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form onSubmit={handleSubmit(onSubmit)} className='text-lg p-5'>
       {typeForm === 'registration' ? (
-        <Field>
-          <Input {...register('username')} placeholder='Username' />
-          {errors.username && <p className='text-sm text-blue-500'>{errors.username.message}</p>}
-        </Field>
+        <div className='my-3'>
+          <input {...register('username')} placeholder='Username' autoComplete='on' />
+          {errors.username && <p className='form__input'>{errors.username.message}</p>}
+        </div>
       ) : null}
-      <Field>
-        <Input {...register('email')} placeholder='Email' />
-        {errors.email && <p className='text-sm text-blue-500'>{errors.email.message}</p>}
-      </Field>
-      <Field>
-        <Input {...register('password')} placeholder='Password' type='password' />
-        {errors.password && <p className='text-sm text-blue-500'>{errors.password.message}</p>}
-      </Field>
+      <div className='my-3'>
+        <input {...register('email')} placeholder='Email' autoComplete='on' />
+        {errors.email && <p className='form__input'>{errors.email.message}</p>}
+      </div>
+      <div className='my-3'>
+        <input
+          {...register('password')}
+          placeholder='Password'
+          type='password'
+          autoComplete='off'
+        />
+        {errors.password && <p className='form__input'>{errors.password.message}</p>}
+      </div>
       {typeForm === 'registration' ? (
-        <Field>
-          <Input {...register('confirm')} placeholder='Confirm password' type='password' />
-          {errors.confirm && <p className='text-sm text-blue-500'>{errors.confirm.message}</p>}
-        </Field>
+        <div className='my-3'>
+          <input
+            {...register('confirm')}
+            placeholder='Confirm password'
+            type='password'
+            autoComplete='off'
+          />
+          {errors.confirm && <p className='form__input'>{errors.confirm.message}</p>}
+        </div>
       ) : null}
       {regError || loginError ? (
-        <p className='text-base text-center text-blue-500 m-2'>{error && error.response?.data}</p>
+        <p className='form__error'>{error && error.response?.data}</p>
       ) : null}
-      {isRegLoading || isLoginLoading ? <Spinner /> : <ButtonSubmit isValid={!isValid} />}
+      {isRegLoading || isLoginLoading ? (
+        <Spinner />
+      ) : (
+        <input
+          type='submit'
+          disabled={!isValid}
+          className='text-xl bg-blue-400 px-3 py-2 transition-colors hover:bg-blue-500 cursor-pointer block mx-auto disabled:bg-blue-200 '
+          value='Submit'
+        />
+      )}
     </form>
   );
 };

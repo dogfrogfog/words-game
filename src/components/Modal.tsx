@@ -29,6 +29,7 @@ const LinkForm = ({
 
 const Modal = ({ visible, onClose }: IModalProps) => {
   const [activeForm, setActiveForm] = useState('registration');
+
   if (!visible) return null;
 
   return (
@@ -62,7 +63,7 @@ const Modal = ({ visible, onClose }: IModalProps) => {
           </LinkForm>
         </div>
 
-        <Form typeForm={activeForm} />
+        <Form typeForm={activeForm} onClose={onClose} />
       </div>
     </div>
   );

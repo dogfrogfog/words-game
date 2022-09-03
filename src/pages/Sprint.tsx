@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import speaker from 'assets/svg/speaker.svg';
-import { useLocation } from '@tanstack/react-location';
+import { Link, useLocation } from '@tanstack/react-location';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
+import { Routes } from 'constants/routes';
 
 interface IInitBackgroundProps {
   initCount: number;
@@ -202,7 +203,10 @@ const Game = ({ words }: IGameProps) => {
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
           0
         </div>
-        <div className='bg-sprint-close w-10 h-10 bg-contain bg-no-repeat hover:invert cursor-pointer' />
+        <Link
+          to={Routes.HOME}
+          className='bg-sprint-close w-10 h-10 bg-contain bg-no-repeat hover:invert cursor-pointer'
+        />
       </div>
       <div className='flex flex-col justify-center items-center'>
         <div className='flex justify-end items-center w-[500px] pb-5'>

@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-export type FormInputs = {
-  username?: string;
-  email: string;
-  password: string;
-  confirm?: string;
-};
-
 const formSchema = z.object({
   username: z.string().min(4, {
     message: 'Имя должно быть длинной не меньше 4 символов',

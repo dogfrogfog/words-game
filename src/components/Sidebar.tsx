@@ -7,7 +7,7 @@ import audioChallenge from 'assets/svg/audio.svg';
 import sprint from 'assets/svg/sprint.svg';
 import statistics from 'assets/svg/statistics.svg';
 
-import Routes from 'constants/routes';
+import { Routes } from 'constants/routes';
 
 interface ISidebarProps {
   menuState: boolean;

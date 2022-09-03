@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { IWord, IUserWord, IAuth, ISetting, IStatistic, IUser } from 'interfaces/apiData';
 import { BASE_URL } from 'constants/constants';
 
@@ -7,18 +7,21 @@ const ApiService = () => {
     baseURL: BASE_URL,
   });
 
-  api.interceptors.request.use((config) => {
-    const requestConfig = config;
-    const token = localStorage.getItem('token');
+  api.interceptors.request.use(
+    (config) => {
+      const requestConfig = config;
+      const token = localStorage.getItem('token');
 
-    if (requestConfig.headers && token) {
-      requestConfig.headers.Authorization = `Bearer ${token}`;
-    }
+      if (requestConfig.headers && token) {
+        requestConfig.headers.Authorization = `Bearer ${token}`;
+      }
 
-    return config;
-  });
+      return config;
+    },
+    (error: AxiosError) => error,
+  );
 
-  const signIn = async ({
+  const logIn = async ({
     email,
     password,
   }: {
@@ -31,7 +34,6 @@ const ApiService = () => {
     });
     return result.data;
   };
-
   const getNewToken = async (id: string): Promise<IAuth> => {
     const response = await api.get<IAuth>(`users/${id}/tokens`);
 
@@ -41,6 +43,19 @@ const ApiService = () => {
     const response = await api.post<IUser>('users', user);
 
     return response.data;
+  };
+
+  const registration = async (user: IUser): Promise<IAuth> => {
+    await createUser(user);
+
+    const { email, password } = user;
+
+    const result = await logIn({
+      email,
+      password,
+    });
+
+    return result;
   };
 
   const getUser = async (id: string): Promise<IUser> => {
@@ -173,7 +188,7 @@ const ApiService = () => {
   };
 
   return {
-    signIn,
+    logIn,
     createUser,
     getUser,
     getNewToken,
@@ -190,6 +205,7 @@ const ApiService = () => {
     getWords,
     getStatictics,
     getUserWord,
+    registration,
   };
 };
 

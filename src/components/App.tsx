@@ -1,18 +1,29 @@
 import { useState } from 'react';
-import { Route, ReactLocation, Outlet, Router } from '@tanstack/react-location';
+// eslint-disable-next-line prettier/prettier, object-curly-newline
+import {
+  Route,
+  createBrowserHistory,
+  ReactLocation,
+  Outlet,
+  Router,
+  // eslint-disable-next-line object-curly-newline
+} from '@tanstack/react-location';
 
 import Routes from 'constants/routes';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';
 import Wordbook from 'pages/Wordbook';
-import Home from 'pages/home';
+import Home from 'pages/Home';
 import Statistics from 'pages/Statistics';
 import Sprint from 'pages/Sprint';
 import Challenge from 'pages/Challenge';
 import Modal from './Modal';
 
-const location = new ReactLocation();
+const history = createBrowserHistory();
+const location = new ReactLocation({
+  history,
+});
 
 const routes: Route[] = [
   {
@@ -47,13 +58,13 @@ const App = () => {
 
   return (
     <Router routes={routes} location={location}>
-      <div className='flex flex-col justify-between h-screen pt-[70px] relative'>
+      <div className='flex flex-col justify-between pt-[68px] relative'>
         <Header
           handleOpen={() => setModalActive(true)}
           menuState={isMenuOpen}
           toggleMenu={toggleMenu}
         />
-        <main className='flex justify-between pr-2 h-full'>
+        <main className='flex justify-between h-full'>
           <Sidebar menuState={isMenuOpen} />
           <Outlet />
         </main>

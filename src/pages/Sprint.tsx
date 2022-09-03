@@ -9,11 +9,6 @@ interface IInitBackgroundProps {
   hideInitBackground: () => void;
 }
 
-const signin = API.signIn({
-  email: 'nikitosvik87@gmail.com',
-  password: 'rslang123',
-});
-
 const InitBackground = ({ initCount, hideInitBackground }: IInitBackgroundProps) => {
   const [initCountState, setInitCountState] = useState(4);
   useEffect(() => {

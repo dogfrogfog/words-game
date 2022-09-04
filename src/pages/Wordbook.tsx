@@ -1,5 +1,5 @@
 import PageTitle from 'components/PageTitle';
-import { useEffect, useState, createRef, useContext } from 'react';
+import React, { useEffect, useState, createRef, useContext } from 'react';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
 import { BASE_URL } from '../constants/constants';
@@ -10,6 +10,11 @@ import thunderImg from '../assets/png/thunder.png';
 import thunderGreyImg from '../assets/png/thunder_grey.png';
 import checkImg from '../assets/png/check.png';
 import checkGreyImg from '../assets/png/check_grey.png';
+
+interface IWordBook {
+  group: number;
+  page: number;
+}
 
 interface IWordProps {
   word: IWord;
@@ -29,12 +34,14 @@ interface IControlBarProps {
   changePage: React.Dispatch<React.SetStateAction<number>>;
   changeTranslate: React.Dispatch<React.SetStateAction<boolean>>;
   page: number;
+  selectedGroup: number;
   translate: boolean;
   isAuth: boolean;
 }
 
 interface IGroupSelectorProps {
   changeGroup: React.Dispatch<React.SetStateAction<number>>;
+  selectedGroup: number;
   isAuth: boolean;
 }
 
@@ -53,6 +60,33 @@ interface IWordBlockProps {
   example: string;
   translate: string;
   isTranslate: boolean;
+}
+
+function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : initialValue;
+    } catch (error) {
+      console.log(error);
+      return initialValue;
+    }
+  });
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return [storedValue, setValue] as const;
 }
 
 const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) => {
@@ -91,7 +125,7 @@ const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) 
   );
 };
 
-const GroupSelector = ({ changeGroup, isAuth }: IGroupSelectorProps) => {
+const GroupSelector = ({ changeGroup, selectedGroup, isAuth }: IGroupSelectorProps) => {
   const selectRef = createRef<HTMLSelectElement>();
   const handleChange = () => {
     changeGroup(+(selectRef.current as HTMLSelectElement).value);
@@ -101,7 +135,7 @@ const GroupSelector = ({ changeGroup, isAuth }: IGroupSelectorProps) => {
 
   return (
     <div className='pl-2 pr-2 border border-blue-400 rounded'>
-      <select id='group' onChange={handleChange} ref={selectRef}>
+      <select id='group' onChange={handleChange} ref={selectRef} value={String(selectedGroup)}>
         <option className={optionStyles} value='0'>
           Раздел 1
         </option>
@@ -191,11 +225,12 @@ const ControlBar = ({
   changePage,
   changeTranslate,
   page,
+  selectedGroup,
   translate,
   isAuth,
 }: IControlBarProps) => (
   <div className='flex mb-4 mt-4 text-xl text-center flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
-    <GroupSelector changeGroup={changeGroup} isAuth={isAuth} />
+    <GroupSelector changeGroup={changeGroup} selectedGroup={selectedGroup} isAuth={isAuth} />
     <Pagination changePage={changePage} page={page} />
     <Options changeTranslate={changeTranslate} showTranslate={translate} />
   </div>
@@ -294,8 +329,20 @@ const WordsList = ({ group, page, translate, isAuth }: IWordsListProps) => {
 };
 
 const Wordbook = () => {
-  const [groupNum, setGroupNum] = useState(0);
-  const [pageNum, setPageNum] = useState(0);
+  const [wordBook, setWordBook] = useLocalStorage<IWordBook>('wordBook', {
+    group: 0,
+    page: 0,
+  });
+
+  const [groupNum, setGroupNum] = useState(wordBook.group);
+  const [pageNum, setPageNum] = useState(wordBook.page);
+
+  useEffect(() => {
+    wordBook.group = groupNum;
+    wordBook.page = pageNum;
+    setWordBook(wordBook);
+  }, [wordBook, setWordBook, groupNum, pageNum]);
+
   const [showTranslate, setShowTranslate] = useState(false);
   const { state, dispatch } = useContext(Context);
   const isAuth = !!state.user;
@@ -307,6 +354,7 @@ const Wordbook = () => {
         changeGroup={setGroupNum}
         changePage={setPageNum}
         changeTranslate={setShowTranslate}
+        selectedGroup={groupNum}
         page={pageNum}
         translate={showTranslate}
         isAuth={isAuth}

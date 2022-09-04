@@ -1,20 +1,27 @@
 import PageTitle from 'components/PageTitle';
-import { useEffect, useState, createRef } from 'react';
+import { useEffect, useState, createRef, useContext } from 'react';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
+import { BASE_URL } from '../constants/constants';
+import { Context } from '../context/context';
 import playImg from '../assets/png/play-button.png';
 import pauseImg from '../assets/png/pause-button.png';
-import { BASE_URL } from '../constants/constants';
+import thunderImg from '../assets/png/thunder.png';
+import thunderGreyImg from '../assets/png/thunder_grey.png';
+import checkImg from '../assets/png/check.png';
+import checkGreyImg from '../assets/png/check_grey.png';
 
 interface IWordProps {
   word: IWord;
   translate: boolean;
+  isAuth: boolean;
 }
 
 interface IWordsListProps {
   group: number;
   page: number;
   translate: boolean;
+  isAuth: boolean;
 }
 
 interface IControlBarProps {
@@ -23,10 +30,12 @@ interface IControlBarProps {
   changeTranslate: React.Dispatch<React.SetStateAction<boolean>>;
   page: number;
   translate: boolean;
+  isAuth: boolean;
 }
 
 interface IGroupSelectorProps {
   changeGroup: React.Dispatch<React.SetStateAction<number>>;
+  isAuth: boolean;
 }
 
 interface IPaginationProps {
@@ -82,7 +91,7 @@ const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) 
   );
 };
 
-const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
+const GroupSelector = ({ changeGroup, isAuth }: IGroupSelectorProps) => {
   const selectRef = createRef<HTMLSelectElement>();
   const handleChange = () => {
     changeGroup(+(selectRef.current as HTMLSelectElement).value);
@@ -111,6 +120,11 @@ const GroupSelector = ({ changeGroup }: IGroupSelectorProps) => {
         <option className={optionStyles} value='5'>
           Раздел 6
         </option>
+        {isAuth && (
+          <option className={optionStyles} value='6'>
+            Сложные слова
+          </option>
+        )}
       </select>
     </div>
   );
@@ -178,15 +192,16 @@ const ControlBar = ({
   changeTranslate,
   page,
   translate,
+  isAuth,
 }: IControlBarProps) => (
   <div className='flex mb-4 mt-4 text-xl text-center flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
-    <GroupSelector changeGroup={changeGroup} />
+    <GroupSelector changeGroup={changeGroup} isAuth={isAuth} />
     <Pagination changePage={changePage} page={page} />
     <Options changeTranslate={changeTranslate} showTranslate={translate} />
   </div>
 );
 
-const Word = ({ word, translate }: IWordProps) => {
+const Word = ({ word, translate, isAuth }: IWordProps) => {
   const groupColors = [
     'bg-[#b1d9a3]',
     'bg-[#cbe8be]',
@@ -195,16 +210,45 @@ const Word = ({ word, translate }: IWordProps) => {
     'bg-[#ffcccb]',
     'bg-[#fcbaba]',
   ];
+  const [isDifficult, setIsDifficult] = useState(false);
+  const [isLearnt, setIsLearnt] = useState(false);
+
+  const thunderSrc = isDifficult ? thunderImg : thunderGreyImg;
+  const difficultTitle = isDifficult ? 'Убрать из сложных слов' : 'Добавить в сложные слова';
+  const handleDifficultClick = () => setIsDifficult(!isDifficult);
+
+  const checkSrc = isLearnt ? checkImg : checkGreyImg;
+  const learntTitle = isLearnt ? 'Убрать из изученных слов' : 'Добавить в изученные слова';
+  const handleLearntClick = () => setIsLearnt(!isLearnt);
+
+  const optionImgClass = 'h-14 cursor-pointer';
 
   return (
     <div
       className={`p-3 mb-4 text-lg rounded shadow-lg shadow-slate-300 ${groupColors[word.group]}`}
     >
-      <img
-        src={`${BASE_URL}${word.image}`}
-        alt={`${word.word}`}
-        className='mx-auto rounded shadow-md shadow-black mb-2'
-      />
+      <div className='flex flex-row mb-2 justify-between'>
+        {isAuth && (
+          <button className='self-start' type='button' onClick={handleDifficultClick}>
+            <img
+              className={optionImgClass}
+              src={thunderSrc}
+              alt='difficult'
+              title={difficultTitle}
+            />
+          </button>
+        )}
+        <img
+          src={`${BASE_URL}${word.image}`}
+          alt={`${word.word}`}
+          className='mx-auto rounded shadow-md shadow-black'
+        />
+        {isAuth && (
+          <button className='self-start' type='button' onClick={handleLearntClick}>
+            <img className={optionImgClass} src={checkSrc} alt='difficult' title={learntTitle} />
+          </button>
+        )}
+      </div>
       <p className='mb-2 font-bold text-center'>
         {`${word.word} - ${word.transcription} - ${word.wordTranslate}`}
       </p>
@@ -226,7 +270,7 @@ const Word = ({ word, translate }: IWordProps) => {
   );
 };
 
-const WordsList = ({ group, page, translate }: IWordsListProps) => {
+const WordsList = ({ group, page, translate, isAuth }: IWordsListProps) => {
   const [words, setWords] = useState<IWord[]>([]);
   useEffect(() => {
     API.getWords(group, page)
@@ -239,7 +283,9 @@ const WordsList = ({ group, page, translate }: IWordsListProps) => {
   return (
     <div className='pl-2 pr-2'>
       {words.length === 20 ? (
-        words.map((word) => <Word word={word} key={word.id} translate={translate} />)
+        words.map((word) => (
+          <Word word={word} key={word.id} translate={translate} isAuth={isAuth} />
+        ))
       ) : (
         <img className='w-20 block mx-auto ' src='https://i.gifer.com/ZZ5H.gif' alt='loader' />
       )}
@@ -251,6 +297,8 @@ const Wordbook = () => {
   const [groupNum, setGroupNum] = useState(0);
   const [pageNum, setPageNum] = useState(0);
   const [showTranslate, setShowTranslate] = useState(false);
+  const { state, dispatch } = useContext(Context);
+  const isAuth = !!state.user;
 
   return (
     <div className='py-2 px-2 w-full'>
@@ -261,8 +309,9 @@ const Wordbook = () => {
         changeTranslate={setShowTranslate}
         page={pageNum}
         translate={showTranslate}
+        isAuth={isAuth}
       />
-      <WordsList group={groupNum} page={pageNum} translate={showTranslate} />
+      <WordsList group={groupNum} page={pageNum} translate={showTranslate} isAuth={isAuth} />
     </div>
   );
 };

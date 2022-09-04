@@ -43,7 +43,7 @@ const contextReducer = (state: State, action: Action): State => {
         ...state,
         user: action.payload,
       };
-    case ActionType.LOGAUT:
+    case ActionType.LOGOUT:
       return {
         ...state,
         user: null,

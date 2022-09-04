@@ -1,15 +1,15 @@
 import type { IAuth } from 'interfaces/apiData';
 import { ActionType } from 'constants/actionType';
 
-export type Action = AuthUser | LogautUser;
+export type Action = AuthUser | LogoutUser;
 
 type AuthUser = {
   type: ActionType.AUTH;
   payload: IAuth;
 };
 
-type LogautUser = {
-  type: ActionType.LOGAUT;
+type LogoutUser = {
+  type: ActionType.LOGOUT;
   payload: null;
 };
 export const actions = {
@@ -18,8 +18,8 @@ export const actions = {
     payload: user,
   }),
 
-  logautUser: (): LogautUser => ({
-    type: ActionType.LOGAUT,
+  logoutUser: (): LogoutUser => ({
+    type: ActionType.LOGOUT,
     payload: null,
   }),
 };

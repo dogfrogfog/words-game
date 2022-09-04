@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Route, ReactLocation, Outlet, Router } from '@tanstack/react-location';
 
-import Routes from 'constants/routes';
+import { Routes } from 'constants/routes';
+
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';

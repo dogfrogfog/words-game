@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { useEffect, useState, createRef } from 'react';
 import speaker from 'assets/svg/speaker.svg';
 import { Link, useLocation } from '@tanstack/react-location';
@@ -186,6 +185,7 @@ const Pronounce = ({ audio }: IPronounceProps) => {
   return (
     <div className='basis-[33%] flex justify-center'>
       <button
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={() => playAudio()}
         className='cursor-pointer hover:bg-blue-200/80 rounded-lg'
         type='button'
@@ -196,6 +196,23 @@ const Pronounce = ({ audio }: IPronounceProps) => {
   );
 };
 
+interface IProgressProps {
+  seqRightAnswers: number;
+}
+
+const Progress = ({ seqRightAnswers }: IProgressProps) => {
+  const level = seqRightAnswers % 3;
+  const firstBg = level >= 0 ? 'bg-blue-600' : 'bg-slate-900/50';
+  const secondBg = level >= 1 ? 'bg-blue-600' : 'bg-slate-900/50';
+  const thirdBg = level === 2 ? 'bg-blue-600' : 'bg-slate-900/50';
+  return (
+    <div className='basis-[33%] mx-auto flex justify-center items-center gap-[15px]'>
+      <div className={`w-[20px] h-[20px] rounded-full ${firstBg}`} />
+      <div className={`w-[20px] h-[20px] rounded-full ${secondBg}`} />
+      <div className={`w-[20px] h-[20px] rounded-full ${thirdBg}`} />
+    </div>
+  );
+};
 interface IGameProps {
   words: IWord[];
 }
@@ -205,21 +222,40 @@ const Game = ({ words }: IGameProps) => {
   const [indexWord, setIndexWord] = useState(0);
   const [sortedArr, setSortedArr] = useState(sortWords(words));
   const [audio, setAudio] = useState(sortedArr[indexWord].word.audio);
-
+  const [score, setScore] = useState(0);
+  const [scoreLevel, setScoreLevel] = useState(0);
+  const [sequenceRightAnswers, setSequenceRightAnswers] = useState(0);
+  const scoreKP = [10, 20, 40, 80];
   const finishGame = () => setEndGame(true);
   const checkAnswer = (answer: boolean) => {
     const { word, rightAnswer } = sortedArr[indexWord];
     const result = answer === rightAnswer;
+    if (!result) {
+      setScoreLevel(0);
+      setSequenceRightAnswers(0);
+    }
+    if (result) {
+      setSequenceRightAnswers((prev) => prev + 1);
+      console.log(`sequenceRightAnswers - ${sequenceRightAnswers}`);
+      const s = Math.floor((sequenceRightAnswers + 1) / 3);
+      const scoreL = s >= 3 ? 3 : s;
+      setScoreLevel(() => scoreL);
+      console.log(`scoreLevel - ${scoreLevel}`);
+      setScore((prev) => prev + scoreKP[scoreL]);
+      console.log(`score - ${score}`);
+    }
 
     if (indexWord < sortedArr.length - 1) {
       setIndexWord((prev) => prev + 1);
       setAudio(() => sortedArr[indexWord + 1].word.audio);
     }
   };
+
   const handleKeypress = (e: KeyboardEvent) => {
     if (e.key === 'ArrowRight') checkAnswer(true);
     if (e.key === 'ArrowLeft') checkAnswer(false);
   };
+
   useEffect(() => {
     document.addEventListener('keydown', handleKeypress);
     return () => {
@@ -231,14 +267,14 @@ const Game = ({ words }: IGameProps) => {
   return (
     <div className='w-full'>
       {endGame && (
-        <div className='SOMECLASS fixed inset-0 flex justify-center items-center z-50'>
+        <div className='fixed inset-0 flex justify-center items-center z-50'>
           <div className='w-[500px] h-[500px] bg-slate-200 rounded-xl'>статистика</div>
         </div>
       )}
       <div className='flex justify-between items-center w-full pb-10'>
         <Timer initCount={60} finishGame={finishGame} />
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
-          0
+          {score}
         </div>
         <Link
           to={Routes.HOME}
@@ -255,20 +291,24 @@ const Game = ({ words }: IGameProps) => {
         <div className='flex flex-col justify-evenly items-center border-emerald-600 w-[500px] min-h-[500px] py-5 border-2 rounded-lg bg-slate-100/40'>
           <div className='flex justify-center items-center w-full'>
             <div className='basis-[33%]' />
-            <div className='basis-[33%] mx-auto flex justify-center items-center gap-[15px]'>
-              <div className='w-[20px] h-[20px] rounded-full bg-slate-900/50' />
-              <div className='w-[20px] h-[20px] rounded-full bg-slate-900/50' />
-              <div className='w-[20px] h-[20px] rounded-full bg-slate-900/50' />
-            </div>
+            <Progress seqRightAnswers={sequenceRightAnswers} />
             <Pronounce audio={audio} />
           </div>
 
           <div className='w-[250px] pt-[40px]'>
             <div className='flex justify-evenly items-center gap-[15px]'>
-              <span className='bg-sprinter1 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
-              <span className='bg-sprinter2 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
-              <span className='bg-sprinter3 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
-              <span className='bg-sprinter4 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
+              {scoreLevel >= 0 && (
+                <span className='bg-sprinter1 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
+              )}
+              {scoreLevel >= 1 && (
+                <span className='bg-sprinter2 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
+              )}
+              {scoreLevel >= 2 && (
+                <span className='bg-sprinter3 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
+              )}
+              {scoreLevel >= 3 && (
+                <span className='bg-sprinter4 w-[50px] h-[50px] inline-block bg-contain bg-center bg-no-repeat' />
+              )}
             </div>
             <div className='-mt-[20px]'>
               <div className='bg-rose-600 w-full h-[10px] border-b-[1px] border-white' />

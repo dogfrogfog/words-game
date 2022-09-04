@@ -1,9 +1,36 @@
-import { useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import { useEffect, useState, createRef } from 'react';
 import speaker from 'assets/svg/speaker.svg';
 import { Link, useLocation } from '@tanstack/react-location';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
 import { Routes } from 'constants/routes';
+import { BASE_URL } from 'constants/constants';
+
+const sortWords = (wordsForSort: IWord[]) => {
+  const max = wordsForSort.length - 1;
+  return wordsForSort
+    .map((word, index) => {
+      const rightAnswer = !!Math.round(Math.random());
+      if (rightAnswer) {
+        return {
+          word,
+          wordTranslate: word.wordTranslate,
+          rightAnswer: true,
+        };
+      }
+      let random = Math.floor(Math.random() * max);
+      while (random === index) {
+        random = Math.floor(Math.random() * max);
+      }
+      return {
+        word,
+        wordTranslate: wordsForSort[random].wordTranslate,
+        rightAnswer: false,
+      };
+    })
+    .sort(() => 0.5 - Math.random());
+};
 
 interface IInitBackgroundProps {
   initCount: number;
@@ -143,38 +170,42 @@ const Complexity = ({ setComplexity }: IComplexityProps) => (
     </div>
   </div>
 );
+interface IPronounceProps {
+  audio: string;
+}
+const Pronounce = ({ audio }: IPronounceProps) => {
+  const playAudio = async () => {
+    const track = new Audio(`${BASE_URL}${audio}`);
+    try {
+      await track.play();
+    } catch (e) {
+      console.log('Failed to play');
+    }
+  };
+
+  return (
+    <div className='basis-[33%] flex justify-center'>
+      <button
+        onClick={() => playAudio()}
+        className='cursor-pointer hover:bg-blue-200/80 rounded-lg'
+        type='button'
+      >
+        <img src={speaker} alt='pronounce' className='w-10 h-10' />
+      </button>
+    </div>
+  );
+};
+
 interface IGameProps {
   words: IWord[];
 }
+
 const Game = ({ words }: IGameProps) => {
   const [endGame, setEndGame] = useState(false);
   const [indexWord, setIndexWord] = useState(0);
-  const sortWords = (wordsForSort: IWord[]) => {
-    const max = wordsForSort.length - 1;
-    return wordsForSort
-      .map((word, index) => {
-        const rightAnswer = !!Math.round(Math.random());
-        if (rightAnswer) {
-          return {
-            word,
-            wordTranslate: word.wordTranslate,
-            rightAnswer: true,
-          };
-        }
-        let random = Math.floor(Math.random() * max);
-        while (random === index) {
-          random = Math.floor(Math.random() * max);
-        }
-        return {
-          word,
-          wordTranslate: wordsForSort[random].wordTranslate,
-          rightAnswer: false,
-        };
-      })
-      .sort(() => 0.5 - Math.random());
-  };
-
   const [sortedArr, setSortedArr] = useState(sortWords(words));
+  const [audio, setAudio] = useState(sortedArr[indexWord].word.audio);
+
   const finishGame = () => setEndGame(true);
   const checkAnswer = (answer: boolean) => {
     const { word, rightAnswer } = sortedArr[indexWord];
@@ -182,6 +213,7 @@ const Game = ({ words }: IGameProps) => {
 
     if (indexWord < sortedArr.length - 1) {
       setIndexWord((prev) => prev + 1);
+      setAudio(() => sortedArr[indexWord + 1].word.audio);
     }
   };
   const handleKeypress = (e: KeyboardEvent) => {
@@ -198,8 +230,13 @@ const Game = ({ words }: IGameProps) => {
 
   return (
     <div className='w-full'>
+      {endGame && (
+        <div className='SOMECLASS fixed inset-0 flex justify-center items-center z-50'>
+          <div className='w-[500px] h-[500px] bg-slate-200 rounded-xl'>статистика</div>
+        </div>
+      )}
       <div className='flex justify-between items-center w-full pb-10'>
-        <Timer initCount={59} finishGame={finishGame} />
+        <Timer initCount={60} finishGame={finishGame} />
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
           0
         </div>
@@ -223,11 +260,7 @@ const Game = ({ words }: IGameProps) => {
               <div className='w-[20px] h-[20px] rounded-full bg-slate-900/50' />
               <div className='w-[20px] h-[20px] rounded-full bg-slate-900/50' />
             </div>
-            <div className='basis-[33%] flex justify-center'>
-              <button className='cursor-pointer hover:bg-blue-200/80 rounded-lg' type='button'>
-                <img src={speaker} alt='pronounce' className='w-10 h-10' />
-              </button>
-            </div>
+            <Pronounce audio={audio} />
           </div>
 
           <div className='w-[250px] pt-[40px]'>

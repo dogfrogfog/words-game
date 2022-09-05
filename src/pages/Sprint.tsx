@@ -119,11 +119,14 @@ const InitBackground = ({ initCount, hideInitBackground }: IInitBackgroundProps)
   );
 };
 interface ITimerProps {
+  children: number;
   initCount: number;
   finishGame: () => void;
+  setTimerCount: (val: number) => void;
+  isEndGame: boolean;
 }
 
-const Timer = ({ initCount, finishGame }: ITimerProps) => {
+const Timer = ({ initCount, finishGame, children, setTimerCount, isEndGame }: ITimerProps) => {
   const [initCountState, setInitCountState] = useState(initCount);
   const [initTime, setInitTime] = useState(Date.now());
   const [timeLeft, setTimeLeft] = useState(6);
@@ -131,10 +134,15 @@ const Timer = ({ initCount, finishGame }: ITimerProps) => {
   useEffect(() => {
     const showTimer = () => {
       setTimeLeft(initCount - 1 - Math.floor((Date.now() - initTime) / 1000));
+      setTimerCount(timeLeft < 0 ? 0 : timeLeft);
       const InitTimer = setInterval(() => {
-        if (timeLeft < 0) {
-          finishGame();
+        if (isEndGame) {
+          clearInterval(InitTimer);
           return;
+        }
+        if (timeLeft <= 0) {
+          finishGame();
+          clearInterval(InitTimer);
         }
         setInitCountState(() => timeLeft);
       }, 1000);
@@ -146,7 +154,7 @@ const Timer = ({ initCount, finishGame }: ITimerProps) => {
   });
 
   const calcPercent = () => {
-    const percent = Math.floor((initCountState * 100) / 60);
+    const percent = Math.floor((timeLeft * 100) / 60);
     const remainder = 100 - percent;
     return {
       percent,
@@ -166,7 +174,7 @@ const Timer = ({ initCount, finishGame }: ITimerProps) => {
       }}
       className='flex justify-center items-center w-[50px] h-[50px] mt-2 rotate-45 rounded-full border-4 text-slate-900 transition-all duration-500 text-2xl font-bold'
     >
-      <span className='-rotate-45'>{initCountState}</span>
+      <span className='-rotate-45'>{children}</span>
     </span>
   );
 };
@@ -304,7 +312,7 @@ interface IGameProps {
 }
 
 const Game = ({ words }: IGameProps) => {
-  const [endGame, setEndGame] = useState(false);
+  const [isEndGame, setEndGame] = useState(false);
   const [indexWord, setIndexWord] = useState(0);
   const [sortedArr, setSortedArr] = useState(sortWords(words));
   const [audio, setAudio] = useState(sortedArr[indexWord].word.audio);
@@ -317,9 +325,10 @@ const Game = ({ words }: IGameProps) => {
   const finishGame = () => setEndGame(true);
   const [rightAnswers, setRightAnswers] = useState(Array<IWord>);
   const [wrongAnswers, setWrongAnswers] = useState(Array<IWord>);
+  const [timerCount, setTimerCount] = useState(60);
 
   const checkAnswer = async (answer: boolean) => {
-    if (endGame) return;
+    if (isEndGame) return;
 
     const { word, rightAnswer } = sortedArr[indexWord];
     const result = answer === rightAnswer;
@@ -360,13 +369,20 @@ const Game = ({ words }: IGameProps) => {
       document.removeEventListener('keydown', handleKeypress);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indexWord, endGame]);
+  }, [indexWord, isEndGame]);
 
   return (
     <div className='w-full'>
-      {endGame && <Results wrongAnswers={wrongAnswers} rightAnswers={rightAnswers} />}
+      {isEndGame && <Results wrongAnswers={wrongAnswers} rightAnswers={rightAnswers} />}
       <div className='flex justify-between items-center w-full pb-10'>
-        <Timer initCount={60} finishGame={finishGame} />
+        <Timer
+          isEndGame={isEndGame}
+          initCount={60}
+          finishGame={finishGame}
+          setTimerCount={(val: number) => setTimerCount(val)}
+        >
+          {timerCount}
+        </Timer>
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
           {score}
         </div>

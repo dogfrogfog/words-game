@@ -316,7 +316,10 @@ const Home = () => {
     });
   };
 
-  useEffect(() => window.addEventListener('scroll', handleScroll));
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  });
   return (
     <div className='w-full h-full bg-gradient-to-br from-slate-600 via-slate-100 via-slate-600 via-slate-200 to-slate-600'>
       <About id='about' visibleIdSet={visibleIdSet} unVisibleIdSet={unVisibleIdSet} />

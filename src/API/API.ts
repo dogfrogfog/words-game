@@ -170,12 +170,12 @@ const ApiService = () => {
     return response.data;
   };
 
-  const getStatictics = async (userId: string): Promise<IStatistic> => {
+  const getStatistics = async (userId: string): Promise<IStatistic> => {
     const response = await api.get<IStatistic>(`/users/${userId}/statistics`);
 
     return response.data;
   };
-  const updateStatictics = async ({
+  const updateStatistics = async ({
     userId,
     setting,
   }: {
@@ -198,12 +198,12 @@ const ApiService = () => {
     getAllUserWords,
     getSettings,
     updateSettings,
-    updateStatictics,
+    updateStatistics,
     deleteUserWord,
     updateUserWord,
     createUserWord,
     getWords,
-    getStatictics,
+    getStatistics,
     getUserWord,
     registration,
   };

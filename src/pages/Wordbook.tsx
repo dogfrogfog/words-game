@@ -1,7 +1,9 @@
 import PageTitle from 'components/PageTitle';
+import Spinner from 'components/Spinner';
 import React, { useEffect, useState, createRef, useContext } from 'react';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
+import useLocalStorage from 'hooks/useLocalStorage';
 import { BASE_URL } from '../constants/constants';
 import { Context } from '../context/context';
 import playImg from '../assets/png/play-button.png';
@@ -60,33 +62,6 @@ interface IWordBlockProps {
   example: string;
   translate: string;
   isTranslate: boolean;
-}
-
-function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : initialValue;
-    } catch (error) {
-      console.log(error);
-      return initialValue;
-    }
-  });
-  const setValue = (value: T | ((val: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  return [storedValue, setValue] as const;
 }
 
 const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) => {
@@ -155,7 +130,7 @@ const GroupSelector = ({ changeGroup, selectedGroup, isAuth }: IGroupSelectorPro
           Раздел 6
         </option>
         {isAuth && (
-          <option className={optionStyles} value='6'>
+          <option className={optionStyles} value='difficult'>
             Сложные слова
           </option>
         )}
@@ -322,7 +297,7 @@ const WordsList = ({ group, page, translate, isAuth }: IWordsListProps) => {
           <Word word={word} key={word.id} translate={translate} isAuth={isAuth} />
         ))
       ) : (
-        <img className='w-20 block mx-auto ' src='https://i.gifer.com/ZZ5H.gif' alt='loader' />
+        <Spinner />
       )}
     </div>
   );

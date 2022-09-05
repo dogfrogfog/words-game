@@ -10,8 +10,26 @@ import speaker from 'assets/svg/speaker.svg';
 import noMusic from 'assets/svg/sprint-no-music.svg';
 import allowMusic from 'assets/svg/sprint-music.svg';
 
+function debounce<F extends (...params: any[]) => void>(fn: F, delay: number) {
+  let timeoutID = 0;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutID);
+    timeoutID = window.setTimeout(() => fn.apply(this, args), delay);
+  } as F;
+}
+
 const playPronounce = async (audio: string) => {
   const track = new Audio(`${BASE_URL}${audio}`);
+  try {
+    await track.play();
+  } catch (e) {
+    console.log('Failed to play');
+  }
+};
+
+const playAnswer = async (sound: string, isAllow: boolean) => {
+  if (!isAllow) return;
+  const track = new Audio(sound);
   try {
     await track.play();
   } catch (e) {
@@ -107,21 +125,25 @@ interface ITimerProps {
 
 const Timer = ({ initCount, finishGame }: ITimerProps) => {
   const [initCountState, setInitCountState] = useState(initCount);
+  const [initTime, setInitTime] = useState(Date.now());
+  const [timeLeft, setTimeLeft] = useState(6);
+
   useEffect(() => {
     const showTimer = () => {
+      setTimeLeft(initCount - 1 - Math.floor((Date.now() - initTime) / 1000));
       const InitTimer = setInterval(() => {
-        if (initCountState <= 0) {
+        if (timeLeft < 0) {
           finishGame();
           return;
         }
-        setInitCountState((prev) => prev - 1);
+        setInitCountState(() => timeLeft);
       }, 1000);
       return InitTimer;
     };
 
     const timer = showTimer();
     return () => clearInterval(timer);
-  }, [initCountState, finishGame]);
+  });
 
   const calcPercent = () => {
     const percent = Math.floor((initCountState * 100) / 60);
@@ -298,26 +320,18 @@ const Game = ({ words }: IGameProps) => {
 
   const checkAnswer = async (answer: boolean) => {
     if (endGame) return;
-    const playAnswer = async (sound: string) => {
-      if (!isAllowMusic) return;
-      const track = new Audio(sound);
-      try {
-        await track.play();
-      } catch (e) {
-        console.log('Failed to play');
-      }
-    };
+
     const { word, rightAnswer } = sortedArr[indexWord];
     const result = answer === rightAnswer;
     if (!result) {
       setWrongAnswers((prev) => [...prev, word]);
-      await playAnswer(wrongSound);
+      await playAnswer(wrongSound, isAllowMusic);
       setScoreLevel(0);
       setSequenceRightAnswers(0);
     }
     if (result) {
       setRightAnswers((prev) => [...prev, word]);
-      await playAnswer(rightSound);
+      await playAnswer(rightSound, isAllowMusic);
       setSequenceRightAnswers((prev) => prev + 1);
       const s = Math.floor((sequenceRightAnswers + 1) / 3);
       const scoreL = s >= 3 ? 3 : s;
@@ -352,7 +366,7 @@ const Game = ({ words }: IGameProps) => {
     <div className='w-full'>
       {endGame && <Results wrongAnswers={wrongAnswers} rightAnswers={rightAnswers} />}
       <div className='flex justify-between items-center w-full pb-10'>
-        <Timer initCount={6} finishGame={finishGame} />
+        <Timer initCount={60} finishGame={finishGame} />
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
           {score}
         </div>

@@ -5,11 +5,12 @@ import { AxiosError } from 'axios';
 import API from 'API/API';
 import { actions } from 'actions/actions';
 
-const useLogin = (dispatch: Dispatch<Action>) =>
+const useLogin = (dispatch: Dispatch<Action>, onClose: () => void) =>
   useMutation(API.logIn, {
     onSuccess: (user) => {
       localStorage.setItem('user', JSON.stringify(user));
       dispatch(actions.authUser(user));
+      onClose();
     },
     onError: (error: AxiosError<string>) => error,
   });

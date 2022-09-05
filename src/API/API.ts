@@ -151,7 +151,6 @@ const ApiService = () => {
 
     return response.data;
   };
-
   const getSettings = async (userId: string): Promise<ISetting> => {
     const response = await api.get<ISetting>(`users/${userId}/settings`);
 

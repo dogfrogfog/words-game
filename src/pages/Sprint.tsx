@@ -1,10 +1,23 @@
-import { useEffect, useState, createRef } from 'react';
-import speaker from 'assets/svg/speaker.svg';
+import { useEffect, useState, ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-location';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
 import { Routes } from 'constants/routes';
 import { BASE_URL } from 'constants/constants';
+import rightSound from 'assets/audio/sprinter-right.mp3';
+import wrongSound from 'assets/audio/sprinter-wrong.mp3';
+import speaker from 'assets/svg/speaker.svg';
+import noMusic from 'assets/svg/sprint-no-music.svg';
+import allowMusic from 'assets/svg/sprint-music.svg';
+
+const playPronounce = async (audio: string) => {
+  const track = new Audio(`${BASE_URL}${audio}`);
+  try {
+    await track.play();
+  } catch (e) {
+    console.log('Failed to play');
+  }
+};
 
 const sortWords = (wordsForSort: IWord[]) => {
   const max = wordsForSort.length - 1;
@@ -37,7 +50,7 @@ interface IInitBackgroundProps {
 }
 
 const InitBackground = ({ initCount, hideInitBackground }: IInitBackgroundProps) => {
-  const [initCountState, setInitCountState] = useState(4);
+  const [initCountState, setInitCountState] = useState(initCount);
   useEffect(() => {
     const showInitBackground = () => {
       const InitTimer = setTimeout(() => {
@@ -96,7 +109,7 @@ const Timer = ({ initCount, finishGame }: ITimerProps) => {
   const [initCountState, setInitCountState] = useState(initCount);
   useEffect(() => {
     const showTimer = () => {
-      const InitTimer = setTimeout(() => {
+      const InitTimer = setInterval(() => {
         if (initCountState <= 0) {
           finishGame();
           return;
@@ -107,7 +120,7 @@ const Timer = ({ initCount, finishGame }: ITimerProps) => {
     };
 
     const timer = showTimer();
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, [initCountState, finishGame]);
 
   const calcPercent = () => {
@@ -172,29 +185,18 @@ const Complexity = ({ setComplexity }: IComplexityProps) => (
 interface IPronounceProps {
   audio: string;
 }
-const Pronounce = ({ audio }: IPronounceProps) => {
-  const playAudio = async () => {
-    const track = new Audio(`${BASE_URL}${audio}`);
-    try {
-      await track.play();
-    } catch (e) {
-      console.log('Failed to play');
-    }
-  };
-
-  return (
-    <div className='basis-[33%] flex justify-center'>
-      <button
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={() => playAudio()}
-        className='cursor-pointer hover:bg-blue-200/80 rounded-lg'
-        type='button'
-      >
-        <img src={speaker} alt='pronounce' className='w-10 h-10' />
-      </button>
-    </div>
-  );
-};
+const Pronounce = ({ audio }: IPronounceProps) => (
+  <div className='basis-[33%] flex justify-center'>
+    <button
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onClick={() => playPronounce(audio)}
+      className='hover:bg-blue-200/80 rounded-lg'
+      type='button'
+    >
+      <img src={speaker} alt='pronounce' className='w-10 h-10' />
+    </button>
+  </div>
+);
 
 interface IProgressProps {
   seqRightAnswers: number;
@@ -202,9 +204,14 @@ interface IProgressProps {
 
 const Progress = ({ seqRightAnswers }: IProgressProps) => {
   const level = seqRightAnswers % 3;
-  const firstBg = level >= 0 ? 'bg-blue-600' : 'bg-slate-900/50';
+  let firstBg = level >= 0 ? 'bg-blue-600' : 'bg-slate-900/50';
   const secondBg = level >= 1 ? 'bg-blue-600' : 'bg-slate-900/50';
-  const thirdBg = level === 2 ? 'bg-blue-600' : 'bg-slate-900/50';
+  let thirdBg = level === 2 ? 'bg-blue-600' : 'bg-slate-900/50';
+
+  if (seqRightAnswers > 12) {
+    firstBg = 'hidden';
+    thirdBg = 'hidden';
+  }
   return (
     <div className='basis-[33%] mx-auto flex justify-center items-center gap-[15px]'>
       <div className={`w-[20px] h-[20px] rounded-full ${firstBg}`} />
@@ -213,6 +220,63 @@ const Progress = ({ seqRightAnswers }: IProgressProps) => {
     </div>
   );
 };
+interface IPrintResultsBtnProps {
+  audio: string;
+}
+const PrintResultsBtn = ({ audio }: IPrintResultsBtnProps) => (
+  <button
+    type='button'
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    onClick={() => playPronounce(audio)}
+    className='hover:bg-blue-200/80 rounded-lg'
+  >
+    <img src={speaker} alt='Prononce' width={40} height={40} />
+  </button>
+);
+interface IResultsProps {
+  wrongAnswers: Array<IWord>;
+  rightAnswers: Array<IWord>;
+}
+
+const printResults = (arr: Array<IWord>): ReactNode =>
+  arr.map((word) => (
+    <p className='flex justify-start items-center py-1' key={word.id}>
+      <PrintResultsBtn audio={word.audio} />
+      <span className='text-lg font-semibold py-1 px-1'>{word.word}</span>
+      <span className='text-lg font-semibold py-1 px-1'> - </span>
+      <span className='text-lg font-semibold py-1 px-1'>{word.wordTranslate}</span>
+    </p>
+  ));
+
+const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
+  <div className='fixed inset-0 flex justify-center items-center z-50'>
+    <div className='w-[500px] h-[500px] bg-white rounded-3xl px-4 flex flex-col justify-evenly items-stretch overflow-auto'>
+      <div className='w-full border-b-2 border-black overflow-auto'>
+        <div className='text-xl font-bold'>
+          <span className='w-full border-b-4 border-rose-700'>Wrong answers - </span>
+          <span>{wrongAnswers.length}</span>
+        </div>
+        <div>{printResults(wrongAnswers)}</div>
+      </div>
+
+      <div className='w-full  overflow-auto'>
+        <div className='text-xl font-bold'>
+          <span className='w-full border-b-4 border-green-600'>Right answers - </span>
+          <span>{rightAnswers.length}</span>
+        </div>
+        <div>{printResults(rightAnswers)}</div>
+      </div>
+
+      <Link
+        to={Routes.HOME}
+        className='mx-auto text-xl font-bold cursor-pointer underline hover:text-blue-600 transition-color '
+      >
+        To Home Page
+      </Link>
+    </div>
+  </div>
+);
+
 interface IGameProps {
   words: IWord[];
 }
@@ -225,54 +289,70 @@ const Game = ({ words }: IGameProps) => {
   const [score, setScore] = useState(0);
   const [scoreLevel, setScoreLevel] = useState(0);
   const [sequenceRightAnswers, setSequenceRightAnswers] = useState(0);
+  const [isAllowMusic, setAllowMusic] = useState(true);
+  const toggleMusic = () => setAllowMusic((prev) => !prev);
   const scoreKP = [10, 20, 40, 80];
   const finishGame = () => setEndGame(true);
-  const checkAnswer = (answer: boolean) => {
+  const [rightAnswers, setRightAnswers] = useState(Array<IWord>);
+  const [wrongAnswers, setWrongAnswers] = useState(Array<IWord>);
+
+  const checkAnswer = async (answer: boolean) => {
+    if (endGame) return;
+    const playAnswer = async (sound: string) => {
+      if (!isAllowMusic) return;
+      const track = new Audio(sound);
+      try {
+        await track.play();
+      } catch (e) {
+        console.log('Failed to play');
+      }
+    };
     const { word, rightAnswer } = sortedArr[indexWord];
     const result = answer === rightAnswer;
     if (!result) {
+      setWrongAnswers((prev) => [...prev, word]);
+      await playAnswer(wrongSound);
       setScoreLevel(0);
       setSequenceRightAnswers(0);
     }
     if (result) {
+      setRightAnswers((prev) => [...prev, word]);
+      await playAnswer(rightSound);
       setSequenceRightAnswers((prev) => prev + 1);
-      console.log(`sequenceRightAnswers - ${sequenceRightAnswers}`);
       const s = Math.floor((sequenceRightAnswers + 1) / 3);
       const scoreL = s >= 3 ? 3 : s;
       setScoreLevel(() => scoreL);
-      console.log(`scoreLevel - ${scoreLevel}`);
       setScore((prev) => prev + scoreKP[scoreL]);
-      console.log(`score - ${score}`);
     }
 
     if (indexWord < sortedArr.length - 1) {
       setIndexWord((prev) => prev + 1);
       setAudio(() => sortedArr[indexWord + 1].word.audio);
+    } else {
+      setEndGame(true);
     }
   };
 
-  const handleKeypress = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowRight') checkAnswer(true);
-    if (e.key === 'ArrowLeft') checkAnswer(false);
+  const handleKeypress = async (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight') await checkAnswer(true);
+    if (e.key === 'ArrowLeft') await checkAnswer(false);
   };
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     document.addEventListener('keydown', handleKeypress);
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       document.removeEventListener('keydown', handleKeypress);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indexWord]);
+  }, [indexWord, endGame]);
 
   return (
     <div className='w-full'>
-      {endGame && (
-        <div className='fixed inset-0 flex justify-center items-center z-50'>
-          <div className='w-[500px] h-[500px] bg-slate-200 rounded-xl'>статистика</div>
-        </div>
-      )}
+      {endGame && <Results wrongAnswers={wrongAnswers} rightAnswers={rightAnswers} />}
       <div className='flex justify-between items-center w-full pb-10'>
-        <Timer initCount={60} finishGame={finishGame} />
+        <Timer initCount={6} finishGame={finishGame} />
         <div className='flex justify-center items-center w-[75px] h-[75px] rounded-full border-4 border-blue-600 font-medium text-xl'>
           {score}
         </div>
@@ -283,8 +363,15 @@ const Game = ({ words }: IGameProps) => {
       </div>
       <div className='flex flex-col justify-center items-center'>
         <div className='flex justify-end items-center w-[500px] pb-5'>
-          <button type='button' className='text-3xl font-bold text-blue-400/80 hover:text-blue-500'>
-            &#9835;
+          <button
+            onClick={toggleMusic}
+            type='button'
+            className='text-3xl font-bold text-blue-400/80 hover:text-blue-500 w-[40px] h-[40px]'
+          >
+            <img
+              src={isAllowMusic ? allowMusic : noMusic}
+              alt={isAllowMusic ? 'allow music' : 'ban music'}
+            />
           </button>
         </div>
 
@@ -327,6 +414,7 @@ const Game = ({ words }: IGameProps) => {
           <div className='flex justify-evenly items-center gap-10'>
             <div className='flex flex-col justify-center items-center'>
               <button
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={() => checkAnswer(false)}
                 type='button'
                 className='w-[100px] h-[40px] rounded-xl bg-rose-400 text-bold hover:bg-rose-500/90'
@@ -337,6 +425,7 @@ const Game = ({ words }: IGameProps) => {
             </div>
             <div className='flex flex-col justify-center items-center'>
               <button
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={() => checkAnswer(true)}
                 type='button'
                 className='w-[100px] h-[40px] rounded-xl bg-green-400 text-medium hover:bg-green-500/90'

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-location';
-import Routes from 'constants/routes';
+import { Routes } from 'constants/routes';
 import slanx from 'assets/img/slanx.jpg';
 import nikitaKakurin from 'assets/img/nikitaKakurin.jpg';
 import thelastandrew from 'assets/img/thelastandrew.jpg';

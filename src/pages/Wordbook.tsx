@@ -91,6 +91,7 @@ const WordBlock = ({ audio, example, translate, isTranslate }: IWordBlockProps) 
         <img src={isPlaying ? pauseImg : playImg} alt='player controls' className='h-6' />
       </button>
       <p
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: example,
         }}
@@ -141,18 +142,34 @@ const GroupSelector = ({ changeGroup, selectedGroup, isAuth }: IGroupSelectorPro
 
 const Pagination = ({ changePage, page }: IPaginationProps) => {
   const [pageNum, setPageNum] = useState(page);
+  const selectRef = createRef<HTMLSelectElement>();
   const decreasePage = () => {
     if (pageNum > 0) {
       setPageNum(pageNum - 1);
       changePage(pageNum - 1);
     }
   };
-
   const increasePage = () => {
     if (page < 29) {
       setPageNum(pageNum + 1);
       changePage(pageNum + 1);
     }
+  };
+  const handleChange = () => {
+    setPageNum(+(selectRef.current as HTMLSelectElement).value);
+    changePage(+(selectRef.current as HTMLSelectElement).value);
+  };
+
+  const createPageList = () => {
+    const pages = [];
+    for (let i = 0; i < 30; i += 1) {
+      pages.push(
+        <option value={i} key={i}>
+          {i + 1}
+        </option>,
+      );
+    }
+    return pages;
   };
 
   const btnBasic = 'pl-2 pr-2 rounded';
@@ -169,7 +186,9 @@ const Pagination = ({ changePage, page }: IPaginationProps) => {
       >
         &lt;
       </button>
-      <span className='p-1'>{pageNum + 1}</span>
+      <select value={page} ref={selectRef} onChange={handleChange}>
+        {createPageList()}
+      </select>
       <button
         type='button'
         disabled={pageNum === 29}
@@ -319,7 +338,7 @@ const Wordbook = () => {
   }, [wordBook, setWordBook, groupNum, pageNum]);
 
   const [showTranslate, setShowTranslate] = useState(false);
-  const { state, dispatch } = useContext(Context);
+  const { state } = useContext(Context);
   const isAuth = !!state.user;
 
   return (

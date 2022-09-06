@@ -1,4 +1,4 @@
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode, useContext } from 'react';
 import { Link, useLocation } from '@tanstack/react-location';
 import API from 'API/API';
 import { IWord } from 'interfaces/apiData';
@@ -9,14 +9,7 @@ import wrongSound from 'assets/audio/sprinter-wrong.mp3';
 import speaker from 'assets/svg/speaker.svg';
 import noMusic from 'assets/svg/sprint-no-music.svg';
 import allowMusic from 'assets/svg/sprint-music.svg';
-
-function debounce<F extends (...params: any[]) => void>(fn: F, delay: number) {
-  let timeoutID = 0;
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timeoutID);
-    timeoutID = window.setTimeout(() => fn.apply(this, args), delay);
-  } as F;
-}
+import { Context } from 'context/context';
 
 const playPronounce = async (audio: string) => {
   const track = new Audio(`${BASE_URL}${audio}`);
@@ -500,23 +493,58 @@ const Game = ({ words }: IGameProps) => {
 interface IStartGameProps {
   complexity: number;
 }
+// const getFiltredWords = async (
+//   userId: string,
+//   group: string,
+//   page: string,
+//   wordsPerPage: string,
+//   token: string,
+// ) => {
+//   const response = await fetch(`${BASE_URL}/users/`, {
+//     method: 'get',
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       Accept: 'application/json',
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify(word),
+//   });
+//   const content = await response.json();
 
+//   console.log(content);
+// };
 const StartGame = ({ complexity }: IStartGameProps) => {
+  const context = useContext(Context);
+  const { user } = context.state;
+  if (!user) throw new Error('you are not authorized');
+  const { userId, token } = user;
   const [isInitBackground, setInitBackgroundShow] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(Array<IWord>);
   const hideInitBackground = () => setInitBackgroundShow(() => false);
   useEffect(() => {
-    API.getWords(`${complexity - 1}`, '1')
-      .then((data) => setWords(data))
+    const filter = JSON.stringify({
+      $and: [
+        {
+          group: complexity,
+        },
+      ],
+    });
+    API.getFiltredWords(userId, '150', filter)
+      .then((data) => setWords(data[0].paginatedResults))
+      .then(() => setIsLoading(false))
       .catch((e: string) => {
         throw new Error(e);
       });
-  }, [complexity]);
+  }, [complexity, userId]);
 
   return (
     <>
-      {isInitBackground && <InitBackground initCount={4} hideInitBackground={hideInitBackground} />}
-      {!isInitBackground && <Game words={words} />}
+      {isLoading && <p className='text-2xl text-white mx-auto z-50'>Loading, please wait...</p>}
+      {(isLoading || isInitBackground) && (
+        <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
+      )}
+      {!isLoading && !isInitBackground && <Game words={words} />}
     </>
   );
 };

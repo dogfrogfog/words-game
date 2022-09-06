@@ -51,3 +51,11 @@ export interface IWord {
 export interface IFiltredWord extends IWord {
   userWord?: Partial<IUserWord>;
 }
+
+interface ITotalCount {
+  count: number;
+}
+export interface IFilteredWords {
+  paginatedResults: Array<IWord>;
+  totalCount: Array<ITotalCount>;
+}

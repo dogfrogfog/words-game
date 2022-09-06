@@ -7,6 +7,7 @@ import type {
   IStatistic,
   IUser,
   IFiltredWord,
+  IFilteredWords,
   // eslint-disable-next-line object-curly-newline
 } from 'interfaces/apiData';
 import type { AxiosError } from 'axios';
@@ -173,8 +174,8 @@ const ApiService = () => {
     userId: string,
     wordsPerPage: string,
     filter: string,
-  ): Promise<IFiltredWord[]> => {
-    const response = await api.get<IFiltredWord[]>(`users/${userId}/aggregatedWords`, {
+  ): Promise<IFilteredWords[]> => {
+    const response = await api.get<IFilteredWords[]>(`users/${userId}/aggregatedWords`, {
       params: {
         filter,
         wordsPerPage,

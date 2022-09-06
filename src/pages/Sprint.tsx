@@ -493,28 +493,10 @@ const Game = ({ words }: IGameProps) => {
 interface IStartGameProps {
   complexity: number;
 }
-// const getFiltredWords = async (
-//   userId: string,
-//   group: string,
-//   page: string,
-//   wordsPerPage: string,
-//   token: string,
-// ) => {
-//   const response = await fetch(`${BASE_URL}/users/`, {
-//     method: 'get',
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//       Accept: 'application/json',
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(word),
-//   });
-//   const content = await response.json();
 
-//   console.log(content);
-// };
 const StartGame = ({ complexity }: IStartGameProps) => {
   const context = useContext(Context);
+  const [isError, setIsError] = useState(false);
   const { user } = context.state;
   if (!user) throw new Error('you are not authorized');
   const { userId, token } = user;
@@ -534,17 +516,32 @@ const StartGame = ({ complexity }: IStartGameProps) => {
       .then((data) => setWords(data[0].paginatedResults))
       .then(() => setIsLoading(false))
       .catch((e: string) => {
-        throw new Error(e);
+        setIsError(true);
       });
   }, [complexity, userId]);
 
   return (
     <>
-      {isLoading && <p className='text-2xl text-white mx-auto z-50'>Loading, please wait...</p>}
-      {(isLoading || isInitBackground) && (
-        <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
+      {isError && (
+        <div className='w-full h-full flex flex-col justify-center items-center'>
+          <p className='text-2xl mx-auto z-50'>Error... Maybe you are not authorized</p>
+          <Link
+            to={Routes.HOME}
+            className='mx-auto text-xl font-bold cursor-pointer text-blue-900 underline hover:text-blue-600 transition-color '
+          >
+            To Home Page
+          </Link>
+        </div>
       )}
-      {!isLoading && !isInitBackground && <Game words={words} />}
+      {!isError && (
+        <>
+          {isLoading && <p className='text-2xl text-white mx-auto z-50'>Loading, please wait...</p>}
+          {(isLoading || isInitBackground) && (
+            <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
+          )}
+          {!isLoading && !isInitBackground && <Game words={words} />}
+        </>
+      )}
     </>
   );
 };

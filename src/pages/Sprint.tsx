@@ -319,6 +319,7 @@ const Game = ({ words }: IGameProps) => {
   const [rightAnswers, setRightAnswers] = useState(Array<IWord>);
   const [wrongAnswers, setWrongAnswers] = useState(Array<IWord>);
   const [timerCount, setTimerCount] = useState(60);
+  const [isArrowKeyDown, setIsArrowKeyDown] = useState(false);
 
   const checkAnswer = async (answer: boolean) => {
     if (isEndGame) return;
@@ -350,19 +351,25 @@ const Game = ({ words }: IGameProps) => {
   };
 
   const handleKeypress = async (e: KeyboardEvent) => {
+    if (isArrowKeyDown) return;
+    setIsArrowKeyDown(true);
     if (e.key === 'ArrowRight') await checkAnswer(true);
     if (e.key === 'ArrowLeft') await checkAnswer(false);
   };
-
+  const handleKeyup = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') setIsArrowKeyDown(false);
+  };
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     document.addEventListener('keydown', handleKeypress);
+    document.addEventListener('keyup', handleKeyup);
     return () => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       document.removeEventListener('keydown', handleKeypress);
+      document.removeEventListener('keyup', handleKeyup);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indexWord, isEndGame]);
+  }, [indexWord, isEndGame, isArrowKeyDown]);
 
   return (
     <div className='w-full'>
@@ -499,7 +506,7 @@ const StartGame = ({ complexity }: IStartGameProps) => {
   const [isError, setIsError] = useState(false);
   const { user } = context.state;
   if (!user) throw new Error('you are not authorized');
-  const { userId, token } = user;
+  const { userId } = user;
   const [isInitBackground, setInitBackgroundShow] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(Array<IWord>);
@@ -509,6 +516,9 @@ const StartGame = ({ complexity }: IStartGameProps) => {
       $and: [
         {
           group: complexity,
+        },
+        {
+          userWord: null,
         },
       ],
     });

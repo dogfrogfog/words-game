@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { Route, ReactLocation, Outlet, Router } from '@tanstack/react-location';
+// eslint-disable-next-line prettier/prettier, object-curly-newline
+import {
+  Route,
+  createBrowserHistory,
+  ReactLocation,
+  Outlet,
+  Router,
+  // eslint-disable-next-line object-curly-newline
+} from '@tanstack/react-location';
 
 import { Routes } from 'constants/routes';
 
@@ -13,7 +21,10 @@ import Sprint from 'pages/Sprint';
 import Challenge from 'pages/Challenge';
 import Modal from './Modal';
 
-const location = new ReactLocation();
+const history = createBrowserHistory();
+const location = new ReactLocation({
+  history,
+});
 
 const routes: Route[] = [
   {

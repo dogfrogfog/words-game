@@ -515,14 +515,14 @@ const StartGame = ({ complexity }: IStartGameProps) => {
     const filter = JSON.stringify({
       $and: [
         {
-          group: complexity,
+          group: complexity - 1,
         },
         {
           userWord: null,
         },
       ],
     });
-    API.getFiltredWords(userId, '150', filter)
+    API.getFiltredWords(userId, '200', filter)
       .then((data) => setWords(data[0].paginatedResults))
       .then(() => setIsLoading(false))
       .catch((e: string) => {
@@ -534,7 +534,9 @@ const StartGame = ({ complexity }: IStartGameProps) => {
     <>
       {isError && (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-          <p className='text-2xl mx-auto z-50'>Error... Maybe you are not authorized</p>
+          <p className='text-2xl mx-auto z-50'>
+            Error... Maybe you are not authorized or your token has ended -log in again
+          </p>
           <Link
             to={Routes.HOME}
             className='mx-auto text-xl font-bold cursor-pointer text-blue-900 underline hover:text-blue-600 transition-color '

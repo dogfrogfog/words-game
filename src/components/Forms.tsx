@@ -31,20 +31,18 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
     resolver: zodResolver(typeForm === KindForm.LOGIN ? formLoginSchema : formRegSchema),
   });
 
-  const { state, dispatch } = useContext(Context);
+  const { dispatch } = useContext(Context);
 
   const {
     mutate: regisrtation,
     isLoading: isRegLoading,
     error: regError,
-    isSuccess: isSuccessReg,
-  } = useRegistration(dispatch);
+  } = useRegistration(dispatch, onClose);
   const {
     mutate: login,
     isLoading: isLoginLoading,
     error: loginError,
-    isSuccess: isSuccessLogin,
-  } = useLogin(dispatch);
+  } = useLogin(dispatch, onClose);
 
   const error = loginError || regError;
 
@@ -68,13 +66,9 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
       email,
     });
 
-    if (isSuccessLogin) {
-      onClose();
-    } else {
-      reset({
-        password: '',
-      });
-    }
+    reset({
+      password: '',
+    });
   };
 
   const onSubmit = typeForm === KindForm.LOGIN ? onLogin : onRegistration;
@@ -84,13 +78,23 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
     <form onSubmit={handleSubmit(onSubmit)} className='text-lg p-5'>
       {typeForm === 'registration' ? (
         <div className='my-3'>
-          <input {...register('username')} placeholder='Username' autoComplete='on' />
-          {errors.username && <p className='form__input'>{errors.username.message}</p>}
+          <input
+            {...register('username')}
+            placeholder='Username'
+            autoComplete='on'
+            className='form__input'
+          />
+          {errors.username && <p className='form__input-error'>{errors.username.message}</p>}
         </div>
       ) : null}
       <div className='my-3'>
-        <input {...register('email')} placeholder='Email' autoComplete='on' />
-        {errors.email && <p className='form__input'>{errors.email.message}</p>}
+        <input
+          {...register('email')}
+          placeholder='Email'
+          autoComplete='on'
+          className='form__input'
+        />
+        {errors.email && <p className='form__input-error'>{errors.email.message}</p>}
       </div>
       <div className='my-3'>
         <input
@@ -98,8 +102,9 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
           placeholder='Password'
           type='password'
           autoComplete='off'
+          className='form__input'
         />
-        {errors.password && <p className='form__input'>{errors.password.message}</p>}
+        {errors.password && <p className='form__input-error'>{errors.password.message}</p>}
       </div>
       {typeForm === 'registration' ? (
         <div className='my-3'>
@@ -108,8 +113,9 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
             placeholder='Confirm password'
             type='password'
             autoComplete='off'
+            className='form__input'
           />
-          {errors.confirm && <p className='form__input'>{errors.confirm.message}</p>}
+          {errors.confirm && <p className='form__input-error'>{errors.confirm.message}</p>}
         </div>
       ) : null}
       {regError || loginError ? (

@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 .form__input {
+  @apply block my-3 border-blue-400 border-2 p-2 w-[100%];
+}
+
+.form__input-error {
   @apply text-sm text-blue-500;
 }
 

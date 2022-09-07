@@ -1,5 +1,5 @@
 import { useEffect, useState, ReactNode, useContext } from 'react';
-import { Link, useLocation } from '@tanstack/react-location';
+import { Link, Navigate, useLocation, useNavigate } from '@tanstack/react-location';
 import API from 'API/API';
 import { IAuth, IWord } from 'interfaces/apiData';
 import { Routes } from 'constants/routes';
@@ -11,6 +11,7 @@ import noMusic from 'assets/svg/sprint-no-music.svg';
 import allowMusic from 'assets/svg/sprint-music.svg';
 import { Context } from 'context/context';
 import { Complexity, Error, InitBackground } from 'components/BeforeStartGame';
+import { useQuery } from '@tanstack/react-query';
 
 const playPronounce = async (audio: string) => {
   const track = new Audio(`${BASE_URL}${audio}`);
@@ -415,34 +416,29 @@ interface IStartGameProps {
 
 const StartGame = ({ complexity }: IStartGameProps) => {
   const context = useContext(Context);
-  const [isError, setIsError] = useState(false);
-  const { user } = context.state;
-  if (!user) {
-    setIsError(true);
-  }
-  const { userId } = user as IAuth;
   const [isInitBackground, setInitBackgroundShow] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [words, setWords] = useState(Array<IWord>);
+  const { user } = context.state;
   const hideInitBackground = () => setInitBackgroundShow(() => false);
-  useEffect(() => {
-    const filter = JSON.stringify({
-      $and: [
-        {
-          group: complexity - 1,
-        },
-        {
-          userWord: null,
-        },
-      ],
-    });
-    API.getFiltredWords(userId, '200', filter)
-      .then((data) => setWords(data[0].paginatedResults))
-      .then(() => setIsLoading(false))
-      .catch((e: string) => {
-        setIsError(true);
-      });
-  }, [complexity, userId]);
+  const filter = JSON.stringify({
+    $and: [
+      {
+        group: complexity - 1,
+      },
+      {
+        userWord: null,
+      },
+    ],
+  });
+
+  const getArrWords = (userId: string, wordsPerPage: string, filterStr: string) =>
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useQuery(['arranged'], () => API.getFiltredWords(userId, wordsPerPage, filterStr));
+
+  if (!user) {
+    return <Navigate to='/401' />;
+  }
+  const { userId } = user;
+  const { isLoading, isError, data, isSuccess } = getArrWords(userId, '200', filter);
 
   return (
     <>
@@ -453,7 +449,9 @@ const StartGame = ({ complexity }: IStartGameProps) => {
           {(isLoading || isInitBackground) && (
             <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
           )}
-          {!isLoading && !isInitBackground && <Game words={words} />}
+          {!isLoading && !isInitBackground && isSuccess && (
+            <Game words={data[0].paginatedResults} />
+          )}
         </>
       )}
     </>

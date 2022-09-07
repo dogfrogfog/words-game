@@ -19,6 +19,8 @@ import Home from 'pages/Home';
 import Statistics from 'pages/Statistics';
 import Sprint from 'pages/Sprint';
 import Challenge from 'pages/Challenge';
+import Page404 from 'pages/Page404';
+import Page401 from 'pages/Page401';
 import Modal from './Modal';
 
 const history = createBrowserHistory();
@@ -46,6 +48,14 @@ const routes: Route[] = [
   {
     path: Routes.CHALLANGE,
     element: <Challenge />,
+  },
+  {
+    path: Routes.NOT_AUTH,
+    element: <Page401 />,
+  },
+  {
+    path: '*',
+    element: <Page404 />,
   },
 ];
 

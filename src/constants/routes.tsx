@@ -4,4 +4,5 @@ export const enum Routes {
   CHALLANGE = '/challange',
   SPRINT = '/sprint',
   STATICTICS = '/statictics',
+  NOT_AUTH = '/401',
 }

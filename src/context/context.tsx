@@ -4,11 +4,11 @@ import type { Dispatch, ReactNode } from 'react';
 import { ActionType } from 'constants/actionType';
 import { createContext, useMemo, useReducer } from 'react';
 
-function isAuthType(user: any): user is IAuth {
+export function isAuthType(user: any): user is IAuth {
   return 'token' in user && 'refreshToken' in user;
 }
 
-function isAuth(user: string | null) {
+export function isAuth(user: string | null) {
   if (user) {
     const parsedUser: unknown = JSON.parse(user);
     if (isAuthType(parsedUser)) return parsedUser;

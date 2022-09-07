@@ -32,23 +32,31 @@ interface ILinkItemProps {
   children: ReactNode;
   image: keyof IMenuImages;
   route: Routes;
+  query?: string;
 }
 
-const LinkItem = ({ children, image, route }: ILinkItemProps) => (
-  <Link
-    to={route}
-    className='group hover:text-orange-500 duration-300 transition-colors cursor-pointer flex flex-col items-center'
-  >
-    <div className='w-[50px] h-[50px] text-center'>
-      <img
-        src={menuImages[image]}
-        alt={image}
-        className='h-[50px] object-contain group-hover:scale-75 transition-transform duration-500 inline-block'
-      />
-    </div>
-    <span className='text-center'>{children}</span>
-  </Link>
-);
+const LinkItem = ({ children, image, route, query = '' }: ILinkItemProps) => {
+  const to = !query ? `${route}` : `${route}${query}`;
+  return (
+    <Link
+      to={to}
+      className='group hover:text-orange-500 duration-300 transition-colors cursor-pointer flex flex-col items-center'
+    >
+      <div className='w-[50px] h-[50px] text-center'>
+        <img
+          src={menuImages[image]}
+          alt={image}
+          className='h-[50px] object-contain group-hover:scale-75 transition-transform duration-500 inline-block'
+        />
+      </div>
+      <span className='text-center'>{children}</span>
+    </Link>
+  );
+};
+
+LinkItem.defaultProps = {
+  query: '',
+};
 
 const Sidebar = ({ menuState }: ISidebarProps) => {
   const asideWidth = menuState ? 'max-w-[110px]' : 'max-w-0';
@@ -65,7 +73,7 @@ const Sidebar = ({ menuState }: ISidebarProps) => {
         <LinkItem route={Routes.CHALLENGE} image='audioChallenge'>
           Audio Challenge
         </LinkItem>
-        <LinkItem route={Routes.SPRINT} image='sprint'>
+        <LinkItem route={Routes.SPRINT} image='sprint' query='?from=menu'>
           Sprint
         </LinkItem>
         <LinkItem route={Routes.STATISTICS} image='statistics'>

@@ -42,8 +42,13 @@ const MenuButton = ({ menuState, toggleMenu }: IMenuButtonProps) => {
 const Header = ({ menuState, toggleMenu, handleOpen }: IHeaderProps) => {
   const { state, dispatch } = useContext(Context);
 
+  const logoutUser = () => {
+    dispatch(actions.logoutUser());
+    localStorage.removeItem('user');
+  };
+
   return (
-    <div className='flex  gap-[40px] items-center justify-between w-full py-4 px-8 fixed top-0 left-0 bg-blue-400'>
+    <div className='flex gap-[40px] items-center justify-between w-full py-4 px-8 fixed top-0 left-0 z-20 bg-blue-400'>
       <MenuButton menuState={menuState} toggleMenu={toggleMenu} />
       <div className='mx-auto'>
         <h1 className='text-3xl'>RSLang</h1>
@@ -52,7 +57,7 @@ const Header = ({ menuState, toggleMenu, handleOpen }: IHeaderProps) => {
         <button
           type='button'
           className='text-xl bg-orange-400/90 rounded-full px-3 py-1 transition-colors hover:bg-orange-500'
-          onClick={() => dispatch(actions.logoutUser())}
+          onClick={() => logoutUser()}
         >
           LogOut
         </button>

@@ -1,5 +1,17 @@
-import axios, { AxiosError } from 'axios';
-import { IWord, IUserWord, IAuth, ISetting, IStatistic, IUser } from 'interfaces/apiData';
+// eslint-disable-next-line object-curly-newline
+import type {
+  IWord,
+  IUserWord,
+  IAuth,
+  ISetting,
+  IStatistic,
+  IUser,
+  IFilteredWord,
+  // eslint-disable-next-line object-curly-newline
+} from 'interfaces/apiData';
+import type { AxiosError } from 'axios';
+import axios from 'axios';
+import { isAuth } from 'context/context';
 import { BASE_URL } from 'constants/constants';
 
 const ApiService = () => {
@@ -10,10 +22,15 @@ const ApiService = () => {
   api.interceptors.request.use(
     (config) => {
       const requestConfig = config;
-      const token = localStorage.getItem('token');
 
-      if (requestConfig.headers && token) {
-        requestConfig.headers.Authorization = `Bearer ${token}`;
+      const user = isAuth(localStorage.getItem('user'));
+
+      if (user) {
+        const { token } = user;
+
+        if (requestConfig.headers) {
+          requestConfig.headers.Authorization = `Bearer ${token}`;
+        }
       }
 
       return config;
@@ -152,6 +169,25 @@ const ApiService = () => {
     return response.data;
   };
 
+  const getFilteredWords = async (
+    userId: string,
+    wordsPerPage: string,
+    filter: string,
+  ): Promise<IFilteredWord[]> => {
+    const response = await api.get<IFilteredWord[]>(`users/${userId}/aggregatedWords`, {
+      params: {
+        filter,
+        wordsPerPage,
+      },
+    });
+    return response.data;
+  };
+
+  const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord> => {
+    const response = await api.get<IFilteredWord>(`users/${userId}/aggregatedWords/${wordsId}`);
+    return response.data;
+  };
+
   const getSettings = async (userId: string): Promise<ISetting> => {
     const response = await api.get<ISetting>(`users/${userId}/settings`);
 
@@ -188,6 +224,8 @@ const ApiService = () => {
   };
 
   return {
+    getFilteredWords,
+    getFilteredWord,
     logIn,
     createUser,
     getUser,

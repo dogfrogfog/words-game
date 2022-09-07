@@ -7,22 +7,17 @@ export interface IAuth {
 }
 
 export interface IOptional {
-  learned: boolean;
-  correctAnswers: number;
+  test: number;
 }
 
 export interface ISetting {
   wordsPerDay: number;
-  optional: {
-    test: string;
-  };
+  optional: IOptional;
 }
 
 export interface IStatistic {
-  learnedWords: number;
-  optional: {
-    test: string;
-  };
+  wordsPerDay: number;
+  optional: IOptional;
 }
 
 export interface IUser {
@@ -33,10 +28,7 @@ export interface IUser {
 
 export interface IUserWord {
   difficulty: string;
-  optional: {
-    learned: boolean;
-    correctAnswers: number;
-  };
+  optional: IOptional;
 }
 
 export interface IWord {
@@ -54,4 +46,8 @@ export interface IWord {
   wordTranslate: string;
   textMeaningTranslate: string;
   textExampleTranslate: string;
+}
+
+export interface IFilteredWord extends IWord {
+  userWord?: Partial<IUserWord>;
 }

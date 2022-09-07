@@ -120,7 +120,7 @@ const ApiService = () => {
   };
 
   const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
-    const response = await api.get<IUserWord[]>(`words/${userId}`);
+    const response = await api.get<IUserWord[]>(`users/${userId}/words`);
 
     return response.data;
   };

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/indent */
 import PageTitle from 'components/PageTitle';
 import Spinner from 'components/Spinner';
 import React, { useEffect, useState, createRef, useContext } from 'react';
 import API from 'API/API';
-import { IWord } from 'interfaces/apiData';
+import { IAuth, IFilteredWord, IWord } from 'interfaces/apiData';
 import useLocalStorage from 'hooks/useLocalStorage';
 import { BASE_URL } from '../constants/constants';
 import { Context } from '../context/context';
@@ -16,19 +17,21 @@ import checkGreyImg from '../assets/png/check_grey.png';
 interface IWordBook {
   group: number;
   page: number;
+  translate: boolean;
 }
 
 interface IWordProps {
-  word: IWord;
+  word: IWord | IFilteredWord;
   translate: boolean;
   isAuth: boolean;
+  user: IAuth | null;
 }
 
 interface IWordsListProps {
   group: number;
   page: number;
   translate: boolean;
-  isAuth: boolean;
+  user: IAuth | null;
 }
 
 interface IControlBarProps {
@@ -38,7 +41,7 @@ interface IControlBarProps {
   page: number;
   selectedGroup: number;
   translate: boolean;
-  isAuth: boolean;
+  user: IAuth | null;
 }
 
 interface IGroupSelectorProps {
@@ -207,7 +210,13 @@ const Options = ({ changeTranslate, showTranslate }: IOptionsProps) => {
   return (
     <div>
       <label htmlFor='options'>
-        <input type='checkbox' id='options' className='mr-2' onChange={handleChange} />
+        <input
+          type='checkbox'
+          id='options'
+          className='mr-2'
+          onChange={handleChange}
+          checked={showTranslate}
+        />
         Скрыть перевод
       </label>
     </div>
@@ -221,16 +230,19 @@ const ControlBar = ({
   page,
   selectedGroup,
   translate,
-  isAuth,
-}: IControlBarProps) => (
-  <div className='flex mb-4 mt-4 text-xl text-center flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
-    <GroupSelector changeGroup={changeGroup} selectedGroup={selectedGroup} isAuth={isAuth} />
-    <Pagination changePage={changePage} page={page} />
-    <Options changeTranslate={changeTranslate} showTranslate={translate} />
-  </div>
-);
+  user,
+}: IControlBarProps) => {
+  const isAuth = !!user;
+  return (
+    <div className='flex mb-4 mt-4 text-xl text-center flex-col min-h-[100px] justify-between md:flex-row md:min-h-[28px]'>
+      <GroupSelector changeGroup={changeGroup} selectedGroup={selectedGroup} isAuth={isAuth} />
+      <Pagination changePage={changePage} page={page} />
+      <Options changeTranslate={changeTranslate} showTranslate={translate} />
+    </div>
+  );
+};
 
-const Word = ({ word, translate, isAuth }: IWordProps) => {
+const Word = ({ word, translate, isAuth, user }: IWordProps) => {
   const groupColors = [
     'bg-[#b1d9a3]',
     'bg-[#cbe8be]',
@@ -244,11 +256,17 @@ const Word = ({ word, translate, isAuth }: IWordProps) => {
 
   const thunderSrc = isDifficult ? thunderImg : thunderGreyImg;
   const difficultTitle = isDifficult ? 'Убрать из сложных слов' : 'Добавить в сложные слова';
-  const handleDifficultClick = () => setIsDifficult(!isDifficult);
+  const handleDifficultClick = () => {
+    if (isLearnt) setIsLearnt(false);
+    setIsDifficult(!isDifficult);
+  };
 
   const checkSrc = isLearnt ? checkImg : checkGreyImg;
   const learntTitle = isLearnt ? 'Убрать из изученных слов' : 'Добавить в изученные слова';
-  const handleLearntClick = () => setIsLearnt(!isLearnt);
+  const handleLearntClick = () => {
+    if (isDifficult) setIsDifficult(false);
+    setIsLearnt(!isLearnt);
+  };
 
   const optionImgClass = 'h-14 cursor-pointer';
 
@@ -299,21 +317,39 @@ const Word = ({ word, translate, isAuth }: IWordProps) => {
   );
 };
 
-const WordsList = ({ group, page, translate, isAuth }: IWordsListProps) => {
-  const [words, setWords] = useState<IWord[]>([]);
+const WordsList = ({ group, page, translate, user }: IWordsListProps) => {
+  const isAuth = !!user;
+  const [words, setWords] = useState<IWord[] | IFilteredWord[]>([]);
+
   useEffect(() => {
-    API.getWords(group, page)
-      .then((wordsArray) => setWords(wordsArray))
-      .catch((e: string) => {
-        throw new Error(e);
+    if (!isAuth) {
+      API.getWords(group, page)
+        .then((wordsArray) => setWords(wordsArray))
+        .catch((e: string) => {
+          throw new Error(e);
+        });
+    } else {
+      const filter = JSON.stringify({
+        $and: [
+          {
+            group,
+            page,
+          },
+        ],
       });
-  }, [group, page]);
+      API.getFilteredWords(user.userId, '20', filter)
+        .then((wordsArray) => setWords(wordsArray))
+        .catch((e: string) => {
+          throw new Error(e);
+        });
+    }
+  }, [group, page, isAuth, user]);
 
   return (
     <div className='pl-2 pr-2'>
       {words.length === 20 ? (
         words.map((word) => (
-          <Word word={word} key={word.id} translate={translate} isAuth={isAuth} />
+          <Word word={word} key={word.word} translate={translate} isAuth={isAuth} user={user} />
         ))
       ) : (
         <Spinner />
@@ -326,20 +362,22 @@ const Wordbook = () => {
   const [wordBook, setWordBook] = useLocalStorage<IWordBook>('wordBook', {
     group: 0,
     page: 0,
+    translate: false,
   });
 
   const [groupNum, setGroupNum] = useState(wordBook.group);
   const [pageNum, setPageNum] = useState(wordBook.page);
+  const [showTranslate, setShowTranslate] = useState(wordBook.translate);
 
   useEffect(() => {
     wordBook.group = groupNum;
     wordBook.page = pageNum;
+    wordBook.translate = showTranslate;
     setWordBook(wordBook);
-  }, [wordBook, setWordBook, groupNum, pageNum]);
+  }, [wordBook, setWordBook, groupNum, pageNum, showTranslate]);
 
-  const [showTranslate, setShowTranslate] = useState(false);
-  const { state } = useContext(Context);
-  const isAuth = !!state.user;
+  const context = useContext(Context);
+  const { user } = context.state;
 
   return (
     <div className='py-2 px-2 w-full'>
@@ -351,9 +389,9 @@ const Wordbook = () => {
         selectedGroup={groupNum}
         page={pageNum}
         translate={showTranslate}
-        isAuth={isAuth}
+        user={user}
       />
-      <WordsList group={groupNum} page={pageNum} translate={showTranslate} isAuth={isAuth} />
+      <WordsList group={groupNum} page={pageNum} translate={showTranslate} user={user} />
     </div>
   );
 };

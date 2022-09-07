@@ -7,7 +7,7 @@ export interface IAuth {
 }
 
 export interface IOptional {
-  test: number;
+  learned: boolean;
 }
 
 export interface ISetting {
@@ -50,4 +50,12 @@ export interface IWord {
 
 export interface IFilteredWord extends IWord {
   userWord?: Partial<IUserWord>;
+}
+
+interface ICount {
+  count: number;
+}
+export interface IFilteredWords {
+  paginatedResults: IFilteredWord[];
+  totalCount: ICount[];
 }

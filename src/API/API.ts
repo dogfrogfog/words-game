@@ -7,6 +7,7 @@ import type {
   IStatistic,
   IUser,
   IFilteredWord,
+  IFilteredWords,
   // eslint-disable-next-line object-curly-newline
 } from 'interfaces/apiData';
 import type { AxiosError } from 'axios';
@@ -101,7 +102,7 @@ const ApiService = () => {
   const deleteUser = async (id: string): Promise<void> =>
     api.delete<void>(`users/${id}`).then((result) => result.data);
 
-  const getWords = async (group: number, page: number) => {
+  const getWords = async (group: number, page: number): Promise<IWord[]> => {
     const response = await api.get<IWord[]>('words', {
       params: {
         group,
@@ -119,7 +120,7 @@ const ApiService = () => {
   };
 
   const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
-    const response = await api.get<IUserWord[]>(`words/${userId}`);
+    const response = await api.get<IUserWord[]>(`words/${userId}/words`);
 
     return response.data;
   };
@@ -174,13 +175,13 @@ const ApiService = () => {
     wordsPerPage: string,
     filter: string,
   ): Promise<IFilteredWord[]> => {
-    const response = await api.get<IFilteredWord[]>(`users/${userId}/aggregatedWords`, {
+    const response = await api.get<IFilteredWords[]>(`users/${userId}/aggregatedWords`, {
       params: {
         filter,
         wordsPerPage,
       },
     });
-    return response.data;
+    return response.data[0].paginatedResults;
   };
 
   const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord> => {

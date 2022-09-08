@@ -187,7 +187,7 @@ const printResults = (arr: Array<IWord>): ReactNode =>
 const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
   <div className='fixed inset-0 flex justify-center items-center z-50'>
     <div className='w-[500px] h-[500px] bg-white rounded-3xl px-4 flex flex-col justify-evenly items-stretch overflow-auto'>
-      <div className='w-full border-b-2 border-black overflow-auto'>
+      <div className='w-full border-b-2 min-h-[30%] border-black overflow-auto'>
         <div className='text-xl font-bold'>
           <span className='w-full border-b-4 border-rose-700'>Wrong answers - </span>
           <span>{wrongAnswers.length}</span>
@@ -195,7 +195,7 @@ const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
         <div>{printResults(wrongAnswers)}</div>
       </div>
 
-      <div className='w-full  overflow-auto'>
+      <div className='w-full min-h-[30%] overflow-auto'>
         <div className='text-xl font-bold'>
           <span className='w-full border-b-4 border-green-600'>Right answers - </span>
           <span>{rightAnswers.length}</span>
@@ -205,7 +205,7 @@ const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
 
       <Link
         to={Routes.HOME}
-        className='mx-auto text-xl font-bold cursor-pointer underline hover:text-blue-600 transition-color '
+        className='mx-auto text-xl font-bold text-blue-500 cursor-pointer underline hover:text-blue-600 transition-color '
       >
         To Home Page
       </Link>
@@ -449,9 +449,7 @@ const StartGame = ({ complexity }: IStartGameProps) => {
           {(isLoading || isInitBackground) && (
             <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
           )}
-          {!isLoading && !isInitBackground && isSuccess && (
-            <Game words={data[0].paginatedResults} />
-          )}
+          {!isLoading && !isInitBackground && isSuccess && <Game words={data} />}
         </>
       )}
     </>

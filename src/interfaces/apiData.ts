@@ -54,14 +54,14 @@ export interface IWord {
   textExampleTranslate: string;
 }
 
-export interface IFiltredWord extends IWord {
+export interface IFilteredWord extends IWord {
   userWord?: Partial<IUserWord>;
 }
 
-interface ITotalCount {
+interface ICount {
   count: number;
 }
 export interface IFilteredWords {
-  paginatedResults: Array<IWord>;
-  totalCount: Array<ITotalCount>;
+  paginatedResults: IFilteredWord[];
+  totalCount: ICount[];
 }

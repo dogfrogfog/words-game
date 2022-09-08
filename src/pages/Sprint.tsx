@@ -1,7 +1,7 @@
 import { useEffect, useState, ReactNode, useContext } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from '@tanstack/react-location';
+import { Link, Navigate } from '@tanstack/react-location';
 import API from 'API/API';
-import { IAuth, IWord } from 'interfaces/apiData';
+import { IWord } from 'interfaces/apiData';
 import { Routes } from 'constants/routes';
 import { BASE_URL } from 'constants/constants';
 import rightSound from 'assets/audio/sprinter-right.mp3';
@@ -407,14 +407,13 @@ const StartGame = ({ complexity }: IStartGameProps) => {
 
   const getArrWords = (userId: string, wordsPerPage: string, filterStr: string) =>
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useQuery(['arranged'], () => API.getFiltredWords(userId, wordsPerPage, filterStr));
+    useQuery(['arranged'], () => API.getFilteredWords(userId, wordsPerPage, filterStr));
 
   if (!user) {
     return <Navigate to='/401' />;
   }
   const { userId } = user;
   const { isLoading, isError, data, isSuccess } = getArrWords(userId, '200', filter);
-
 
   return (
     <>

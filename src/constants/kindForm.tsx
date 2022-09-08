@@ -1,4 +1,4 @@
 export const enum KindForm {
   LOGIN = 'login',
-  REGISTRATION = 'regisrtation',
+  REGISTRATION = 'registration',
 }

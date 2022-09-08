@@ -393,6 +393,7 @@ const StartGame = ({ complexity }: IStartGameProps) => {
   const [isInitBackground, setInitBackgroundShow] = useState(true);
   const { user } = context.state;
   const hideInitBackground = () => setInitBackgroundShow(() => false);
+
   const filter = JSON.stringify({
     $and: [
       {
@@ -413,6 +414,7 @@ const StartGame = ({ complexity }: IStartGameProps) => {
   }
   const { userId } = user;
   const { isLoading, isError, data, isSuccess } = getArrWords(userId, '200', filter);
+
 
   return (
     <>

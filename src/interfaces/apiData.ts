@@ -7,7 +7,7 @@ export interface IAuth {
 }
 
 export interface IOptional {
-  test: number;
+  learned: boolean;
 }
 
 export interface ISetting {

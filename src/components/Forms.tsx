@@ -34,7 +34,7 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
   const { dispatch } = useContext(Context);
 
   const {
-    mutate: regisrtation,
+    mutate: registration,
     isLoading: isRegLoading,
     error: regError,
   } = useRegistration(dispatch, onClose);
@@ -48,7 +48,7 @@ const Form = ({ typeForm, onClose }: IFormProps) => {
 
   const onRegistration: SubmitHandler<FormInputs> = ({ username, password, email }) => {
     if (username) {
-      regisrtation({
+      registration({
         name: username,
         password,
         email,

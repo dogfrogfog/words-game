@@ -42,8 +42,8 @@ const MenuButton = ({ menuState, toggleMenu }: IMenuButtonProps) => {
 const Header = ({ menuState, toggleMenu, handleOpen }: IHeaderProps) => {
   const { state, dispatch } = useContext(Context);
 
-  const logautUser = () => {
-    dispatch(actions.logautUser());
+  const logoutUser = () => {
+    dispatch(actions.logoutUser());
     localStorage.removeItem('user');
   };
 
@@ -57,9 +57,9 @@ const Header = ({ menuState, toggleMenu, handleOpen }: IHeaderProps) => {
         <button
           type='button'
           className='text-xl bg-orange-400/90 rounded-full px-3 py-1 transition-colors hover:bg-orange-500'
-          onClick={() => logautUser()}
+          onClick={() => logoutUser()}
         >
-          Logaut
+          LogOut
         </button>
       ) : (
         <button
@@ -67,7 +67,7 @@ const Header = ({ menuState, toggleMenu, handleOpen }: IHeaderProps) => {
           className='text-xl bg-orange-400/90 rounded-full px-3 py-1 transition-colors hover:bg-orange-500'
           onClick={handleOpen}
         >
-          Login
+          LogIn
         </button>
       )}
     </div>

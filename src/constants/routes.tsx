@@ -1,8 +1,8 @@
 export const enum Routes {
   HOME = '/',
   WORDBOOK = '/wordbook',
-  CHALLANGE = '/challange',
+  CHALLENGE = '/challenge',
   SPRINT = '/sprint',
-  STATICTICS = '/statictics',
+  STATISTICS = '/statistics',
   NOT_AUTH = '/401',
 }

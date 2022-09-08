@@ -70,13 +70,13 @@ const Sidebar = ({ menuState }: ISidebarProps) => {
         <LinkItem route={Routes.WORDBOOK} image='wordbook'>
           Wordbook
         </LinkItem>
-        <LinkItem route={Routes.CHALLANGE} image='audioChallenge'>
+        <LinkItem route={Routes.CHALLENGE} image='audioChallenge'>
           Audio Challenge
         </LinkItem>
         <LinkItem route={Routes.SPRINT} image='sprint' query='?from=menu'>
           Sprint
         </LinkItem>
-        <LinkItem route={Routes.STATICTICS} image='statistics'>
+        <LinkItem route={Routes.STATISTICS} image='statistics'>
           Statistics
         </LinkItem>
       </nav>

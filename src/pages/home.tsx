@@ -169,7 +169,7 @@ const PlayGames = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
       </Link>
 
       <Link
-        to={Routes.CHALLANGE}
+        to={Routes.CHALLENGE}
         className='bg-challenge-img w-[400px] h-[300px] bg-no-repeat bg-cover bg-center rounded-3xl cursor-pointer transition-all duration-500 hover:scale-[1.15] hover:border-8  border-orange-500/95'
       >
         <h4 className='text-4xl mx-auto text-center font-bold py-5'>
@@ -214,7 +214,7 @@ const Statistics = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
       <span className='text-cyan-700'>e</span>
     </h2>
     <Link
-      to={Routes.STATICTICS}
+      to={Routes.STATISTICS}
       className='bg-statistics-img w-[400px] h-[300px] bg-no-repeat bg-cover bg-center rounded-3xl cursor-pointer transition-all duration-500 hover:scale-[1.15] hover:border-8 border-orange-500/95'
     >
       <h4 className='text-4xl mx-auto text-center font-bold'>

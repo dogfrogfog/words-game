@@ -42,11 +42,11 @@ const routes: Route[] = [
     element: <Sprint />,
   },
   {
-    path: Routes.STATICTICS,
+    path: Routes.STATISTICS,
     element: <Statistics />,
   },
   {
-    path: Routes.CHALLANGE,
+    path: Routes.CHALLENGE,
     element: <Challenge />,
   },
   {

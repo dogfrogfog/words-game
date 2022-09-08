@@ -102,7 +102,7 @@ const ApiService = () => {
   const deleteUser = async (id: string): Promise<void> =>
     api.delete<void>(`users/${id}`).then((result) => result.data);
 
-  const getWords = async (group: string, page: string) => {
+  const getWords = async (group: number, page: number): Promise<IWord[]> => {
     const response = await api.get<IWord[]>('words', {
       params: {
         group,
@@ -120,8 +120,7 @@ const ApiService = () => {
   };
 
   const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
-    const response = await api.get<IUserWord[]>(`users/${userId}/words`);
-
+    const response = await api.get<IUserWord[]>(`words/${userId}/words`);
     return response.data;
   };
 
@@ -184,8 +183,9 @@ const ApiService = () => {
     return response.data[0].paginatedResults;
   };
 
-  const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord[]> => {
-    const response = await api.get<IFilteredWord[]>(`users/${userId}/aggregatedWords/${wordsId}`);
+  const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord> => {
+    const response = await api.get<IFilteredWord>(`users/${userId}/aggregatedWords/${wordsId}`);
+
     return response.data;
   };
 
@@ -207,12 +207,12 @@ const ApiService = () => {
     return response.data;
   };
 
-  const getStatictics = async (userId: string): Promise<IStatistic> => {
+  const getStatistics = async (userId: string): Promise<IStatistic> => {
     const response = await api.get<IStatistic>(`/users/${userId}/statistics`);
 
     return response.data;
   };
-  const updateStatictics = async ({
+  const updateStatistics = async ({
     userId,
     setting,
   }: {
@@ -225,8 +225,8 @@ const ApiService = () => {
   };
 
   return {
-    getFiltredWords: getFilteredWords,
-    getFiltredWord: getFilteredWord,
+    getFilteredWords,
+    getFilteredWord,
     logIn,
     createUser,
     getUser,
@@ -237,12 +237,12 @@ const ApiService = () => {
     getAllUserWords,
     getSettings,
     updateSettings,
-    updateStatictics,
+    updateStatistics,
     deleteUserWord,
     updateUserWord,
     createUserWord,
     getWords,
-    getStatictics,
+    getStatistics,
     getUserWord,
     registration,
   };

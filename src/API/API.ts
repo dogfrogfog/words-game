@@ -6,7 +6,8 @@ import type {
   ISetting,
   IStatistic,
   IUser,
-  IFiltredWord,
+  IFilteredWord,
+  IFilteredWords,
   // eslint-disable-next-line object-curly-newline
 } from 'interfaces/apiData';
 import type { AxiosError } from 'axios';
@@ -119,7 +120,7 @@ const ApiService = () => {
   };
 
   const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
-    const response = await api.get<IUserWord[]>(`words/${userId}`);
+    const response = await api.get<IUserWord[]>(`users/${userId}/words`);
 
     return response.data;
   };
@@ -169,22 +170,22 @@ const ApiService = () => {
     return response.data;
   };
 
-  const getFiltredWords = async (
+  const getFilteredWords = async (
     userId: string,
     wordsPerPage: string,
     filter: string,
-  ): Promise<IFiltredWord[]> => {
-    const response = await api.get<IFiltredWord[]>(`users/${userId}/aggregatedWords`, {
+  ): Promise<IFilteredWord[]> => {
+    const response = await api.get<IFilteredWords[]>(`users/${userId}/aggregatedWords`, {
       params: {
         filter,
         wordsPerPage,
       },
     });
-    return response.data;
+    return response.data[0].paginatedResults;
   };
 
-  const getFiltredWord = async (userId: string, wordsId: string): Promise<IFiltredWord[]> => {
-    const response = await api.get<IFiltredWord[]>(`users/${userId}/aggregatedWords/${wordsId}`);
+  const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord[]> => {
+    const response = await api.get<IFilteredWord[]>(`users/${userId}/aggregatedWords/${wordsId}`);
     return response.data;
   };
 
@@ -224,8 +225,8 @@ const ApiService = () => {
   };
 
   return {
-    getFiltredWords,
-    getFiltredWord,
+    getFiltredWords: getFilteredWords,
+    getFiltredWord: getFilteredWord,
     logIn,
     createUser,
     getUser,

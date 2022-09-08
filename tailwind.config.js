@@ -18,7 +18,7 @@ module.exports = {
         'sprint-img': "url('assets/img/sprint-img.png')",
         'challenge-img':"url('assets/img/challenge-img.jpg')",
         'statistics-img':"url('assets/img/statistics-img.png')",
-        'statistics-bg':"url('assets/img/statistics-bg.png')"
+        'statistics-bg':"url('assets/img/statistics-bg.png')",
       }
     },
   },

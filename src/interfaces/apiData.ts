@@ -28,7 +28,13 @@ export interface IUser {
 
 export interface IUserWord {
   difficulty: string;
-  optional: IOptional;
+  optional: IOptionalWord;
+}
+export interface IOptionalWord {
+  correctAnswers: number;
+  wrongAnswers: number;
+  sequenceAnswers: boolean[];
+  learned: boolean;
 }
 
 export interface IWord {
@@ -48,6 +54,14 @@ export interface IWord {
   textExampleTranslate: string;
 }
 
-export interface IFiltredWord extends IWord {
+export interface IFilteredWord extends IWord {
   userWord?: Partial<IUserWord>;
+}
+
+interface ICount {
+  count: number;
+}
+export interface IFilteredWords {
+  paginatedResults: IFilteredWord[];
+  totalCount: ICount[];
 }

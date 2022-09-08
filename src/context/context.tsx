@@ -4,8 +4,9 @@ import type { Dispatch, ReactNode } from 'react';
 import { ActionType } from 'constants/actionType';
 import { createContext, useMemo, useReducer } from 'react';
 
-export function isAuthType(user: any): user is IAuth {
-  return 'token' in user && 'refreshToken' in user;
+export function isAuthType(user: unknown): user is IAuth {
+  if ((user as IAuth).token) return true;
+  return false;
 }
 
 export function isAuth(user: string | null) {

@@ -15,21 +15,15 @@ import { useQuery } from '@tanstack/react-query';
 
 const playPronounce = async (audio: string) => {
   const track = new Audio(`${BASE_URL}${audio}`);
-  try {
-    await track.play();
-  } catch (e) {
-    console.log('Failed to play');
-  }
+
+  await track.play();
 };
 
 const playAnswer = async (sound: string, isAllow: boolean) => {
   if (!isAllow) return;
   const track = new Audio(sound);
-  try {
-    await track.play();
-  } catch (e) {
-    console.log('Failed to play');
-  }
+
+  await track.play();
 };
 
 const sortWords = (wordsForSort: IWord[]) => {
@@ -66,8 +60,9 @@ interface ITimerProps {
 }
 
 const Timer = ({ initCount, finishGame, children, setTimerCount, isEndGame }: ITimerProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [initCountState, setInitCountState] = useState(initCount);
-  const [initTime, setInitTime] = useState(Date.now());
+  const [initTime] = useState(Date.now());
   const [timeLeft, setTimeLeft] = useState(6);
 
   useEffect(() => {
@@ -220,7 +215,7 @@ interface IGameProps {
 const Game = ({ words }: IGameProps) => {
   const [isEndGame, setEndGame] = useState(false);
   const [indexWord, setIndexWord] = useState(0);
-  const [sortedArr, setSortedArr] = useState(sortWords(words));
+  const [sortedArr] = useState(sortWords(words));
   const [audio, setAudio] = useState(sortedArr[indexWord].word.audio);
   const [score, setScore] = useState(0);
   const [scoreLevel, setScoreLevel] = useState(0);

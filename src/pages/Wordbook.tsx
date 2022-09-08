@@ -24,7 +24,6 @@ interface IWordProps {
   word: IWord | IFilteredWord;
   translate: boolean;
   isAuth: boolean;
-  user: IAuth | null;
 }
 
 interface IWordsListProps {
@@ -242,7 +241,7 @@ const ControlBar = ({
   );
 };
 
-const Word = ({ word, translate, isAuth, user }: IWordProps) => {
+const Word = ({ word, translate, isAuth }: IWordProps) => {
   const groupColors = [
     'bg-[#b1d9a3]',
     'bg-[#cbe8be]',
@@ -349,7 +348,7 @@ const WordsList = ({ group, page, translate, user }: IWordsListProps) => {
     <div className='pl-2 pr-2'>
       {words.length === 20 ? (
         words.map((word) => (
-          <Word word={word} key={word.word} translate={translate} isAuth={isAuth} user={user} />
+          <Word word={word} key={word.word} translate={translate} isAuth={isAuth} />
         ))
       ) : (
         <Spinner />

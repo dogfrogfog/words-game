@@ -28,7 +28,13 @@ export interface IUser {
 
 export interface IUserWord {
   difficulty: string;
-  optional: IOptional;
+  optional: IOptionalWord;
+}
+export interface IOptionalWord {
+  correctAnswers: number;
+  wrongAnswers: number;
+  sequenceAnswers: boolean[];
+  learned: boolean;
 }
 
 export interface IWord {

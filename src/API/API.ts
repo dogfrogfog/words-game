@@ -121,7 +121,6 @@ const ApiService = () => {
 
   const getAllUserWords = async (userId: string): Promise<IUserWord[]> => {
     const response = await api.get<IUserWord[]>(`words/${userId}/words`);
-
     return response.data;
   };
 
@@ -186,6 +185,7 @@ const ApiService = () => {
 
   const getFilteredWord = async (userId: string, wordsId: string): Promise<IFilteredWord> => {
     const response = await api.get<IFilteredWord>(`users/${userId}/aggregatedWords/${wordsId}`);
+
     return response.data;
   };
 

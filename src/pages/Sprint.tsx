@@ -1,7 +1,7 @@
-import { useEffect, useState, ReactNode } from 'react';
-import { Link, useLocation } from '@tanstack/react-location';
+import { useEffect, useState, ReactNode, useContext } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from '@tanstack/react-location';
 import API from 'API/API';
-import { IWord } from 'interfaces/apiData';
+import { IAuth, IWord } from 'interfaces/apiData';
 import { Routes } from 'constants/routes';
 import { BASE_URL } from 'constants/constants';
 import rightSound from 'assets/audio/sprinter-right.mp3';
@@ -9,14 +9,9 @@ import wrongSound from 'assets/audio/sprinter-wrong.mp3';
 import speaker from 'assets/svg/speaker.svg';
 import noMusic from 'assets/svg/sprint-no-music.svg';
 import allowMusic from 'assets/svg/sprint-music.svg';
-
-function debounce<F extends (...params: any[]) => void>(fn: F, delay: number) {
-  let timeoutID = 0;
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timeoutID);
-    timeoutID = window.setTimeout(() => fn.apply(this, args), delay);
-  } as F;
-}
+import { Context } from 'context/context';
+import { Complexity, Error, InitBackground } from 'components/BeforeStartGame';
+import { useQuery } from '@tanstack/react-query';
 
 const playPronounce = async (audio: string) => {
   const track = new Audio(`${BASE_URL}${audio}`);
@@ -62,62 +57,6 @@ const sortWords = (wordsForSort: IWord[]) => {
     .sort(() => 0.5 - Math.random());
 };
 
-interface IInitBackgroundProps {
-  initCount: number;
-  hideInitBackground: () => void;
-}
-
-const InitBackground = ({ initCount, hideInitBackground }: IInitBackgroundProps) => {
-  const [initCountState, setInitCountState] = useState(initCount);
-  useEffect(() => {
-    const showInitBackground = () => {
-      const InitTimer = setTimeout(() => {
-        if (initCountState <= 0) {
-          hideInitBackground();
-          return;
-        }
-        setInitCountState((prev) => prev - 1);
-      }, 1000);
-      return InitTimer;
-    };
-
-    const timer = showInitBackground();
-    return () => clearTimeout(timer);
-  }, [initCountState, hideInitBackground]);
-
-  let borderProgressStyle = '';
-  switch (initCountState) {
-    case 0:
-      borderProgressStyle = 'bg-rose-500 animate-pulse';
-      break;
-    case 1:
-      borderProgressStyle = 'border-teal-600 bg-orange-500 animate-pulse';
-      break;
-    case 2:
-      borderProgressStyle += 'border-b-teal-500 border-r-teal-500 border-t-teal-500';
-      break;
-    case 3:
-      borderProgressStyle += 'border-r-teal-500 border-t-teal-500';
-      break;
-    case 4:
-      borderProgressStyle += 'border-t-teal-500';
-      break;
-    default:
-      break;
-  }
-  return (
-    <div className='w-screen h-screen fixed inset-0 bg-slate-900/90 flex justify-center items-center'>
-      <p className='flex flex-col justify-center items-center text-2xl font-bold text-slate-300'>
-        <span
-          className={`flex justify-center items-center w-[75px] h-[75px] mt-2 rotate-45 rounded-full border-4 transition-all duration-500 border-indigo-200 ${borderProgressStyle}`}
-        >
-          <span className='-rotate-45'>{initCountState}</span>
-        </span>
-        <span>get ready</span>
-      </p>
-    </div>
-  );
-};
 interface ITimerProps {
   children: number;
   initCount: number;
@@ -179,39 +118,6 @@ const Timer = ({ initCount, finishGame, children, setTimerCount, isEndGame }: IT
   );
 };
 
-interface IComplexityBtnProps {
-  value: number;
-  setComplexity: (value: number) => void;
-}
-const ComplexityBtn = ({ value, setComplexity }: IComplexityBtnProps) => {
-  const handleClick = () => {
-    setComplexity(value);
-  };
-  return (
-    <button
-      onClick={handleClick}
-      type='button'
-      className='rounded-full w-10 h-10 text-xl font-medium bg-orange-400 hover:bg-orange-500/80 transition-all'
-    >
-      {value}
-    </button>
-  );
-};
-interface IComplexityProps {
-  setComplexity: (val: number) => void;
-}
-const Complexity = ({ setComplexity }: IComplexityProps) => (
-  <div className='w-screen h-screen fixed inset-0 bg-slate-900/90 flex justify-center items-center'>
-    <div className='w-[500px] h-[500px] text-white flex flex-col justify-center items-center'>
-      <h2 className='text-2xl font-semibold pb-10'> Chose Complexity</h2>
-      <div className='flex justify-evenly items-center w-[80%] '>
-        {[1, 2, 3, 4, 5, 6].map((val) => (
-          <ComplexityBtn value={val} setComplexity={setComplexity} key={val} />
-        ))}
-      </div>
-    </div>
-  </div>
-);
 interface IPronounceProps {
   audio: string;
 }
@@ -281,7 +187,7 @@ const printResults = (arr: Array<IWord>): ReactNode =>
 const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
   <div className='fixed inset-0 flex justify-center items-center z-50'>
     <div className='w-[500px] h-[500px] bg-white rounded-3xl px-4 flex flex-col justify-evenly items-stretch overflow-auto'>
-      <div className='w-full border-b-2 border-black overflow-auto'>
+      <div className='w-full border-b-2 min-h-[30%] border-black overflow-auto'>
         <div className='text-xl font-bold'>
           <span className='w-full border-b-4 border-rose-700'>Wrong answers - </span>
           <span>{wrongAnswers.length}</span>
@@ -289,7 +195,7 @@ const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
         <div>{printResults(wrongAnswers)}</div>
       </div>
 
-      <div className='w-full  overflow-auto'>
+      <div className='w-full min-h-[30%] overflow-auto'>
         <div className='text-xl font-bold'>
           <span className='w-full border-b-4 border-green-600'>Right answers - </span>
           <span>{rightAnswers.length}</span>
@@ -299,7 +205,7 @@ const Results = ({ wrongAnswers, rightAnswers }: IResultsProps) => (
 
       <Link
         to={Routes.HOME}
-        className='mx-auto text-xl font-bold cursor-pointer underline hover:text-blue-600 transition-color '
+        className='mx-auto text-xl font-bold text-blue-500 cursor-pointer underline hover:text-blue-600 transition-color '
       >
         To Home Page
       </Link>
@@ -326,6 +232,7 @@ const Game = ({ words }: IGameProps) => {
   const [rightAnswers, setRightAnswers] = useState(Array<IWord>);
   const [wrongAnswers, setWrongAnswers] = useState(Array<IWord>);
   const [timerCount, setTimerCount] = useState(60);
+  const [isArrowKeyDown, setIsArrowKeyDown] = useState(false);
 
   const checkAnswer = async (answer: boolean) => {
     if (isEndGame) return;
@@ -357,19 +264,25 @@ const Game = ({ words }: IGameProps) => {
   };
 
   const handleKeypress = async (e: KeyboardEvent) => {
+    if (isArrowKeyDown) return;
+    setIsArrowKeyDown(true);
     if (e.key === 'ArrowRight') await checkAnswer(true);
     if (e.key === 'ArrowLeft') await checkAnswer(false);
   };
-
+  const handleKeyup = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') setIsArrowKeyDown(false);
+  };
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     document.addEventListener('keydown', handleKeypress);
+    document.addEventListener('keyup', handleKeyup);
     return () => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       document.removeEventListener('keydown', handleKeypress);
+      document.removeEventListener('keyup', handleKeyup);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indexWord, isEndGame]);
+  }, [indexWord, isEndGame, isArrowKeyDown]);
 
   return (
     <div className='w-full'>
@@ -471,68 +384,57 @@ const Game = ({ words }: IGameProps) => {
   );
 };
 
-// const StartGameFromWordBook = () => {
-//   const [initCountState, setInitCountState] = useState(4);
-//   useEffect(() => {
-//     const showInitBackground = () => {
-//       const InitTimer = setInterval(() => {
-//         if (initCountState <= 0) {
-//           clearInterval(InitTimer);
-//           return;
-//         }
-//         setInitCountState((prev) => prev - 1);
-//       }, 1000);
-//       return InitTimer;
-//     };
-
-//     const timer = showInitBackground();
-//     return () => clearInterval(timer);
-//   }, [initCountState]);
-
-//   return (
-//     <>
-//       {initCountState !== 0 && <InitBackground initCount={initCountState} />}
-//       {initCountState === 0 && <Game />}
-//     </>
-//   );
-// };
-
 interface IStartGameProps {
   complexity: number;
 }
 
 const StartGame = ({ complexity }: IStartGameProps) => {
+  const context = useContext(Context);
   const [isInitBackground, setInitBackgroundShow] = useState(true);
-  const [words, setWords] = useState(Array<IWord>);
+  const { user } = context.state;
   const hideInitBackground = () => setInitBackgroundShow(() => false);
-  useEffect(() => {
-    API.getWords(complexity - 1, 1)
-      .then((data) => setWords(data))
-      .catch((e: string) => {
-        throw new Error(e);
-      });
-  }, [complexity]);
+
+  const filter = JSON.stringify({
+    $and: [
+      {
+        group: complexity - 1,
+      },
+      {
+        userWord: null,
+      },
+    ],
+  });
+
+  const getArrWords = (userId: string, wordsPerPage: string, filterStr: string) =>
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useQuery(['arranged'], () => API.getFiltredWords(userId, wordsPerPage, filterStr));
+
+  if (!user) {
+    return <Navigate to='/401' />;
+  }
+  const { userId } = user;
+  const { isLoading, isError, data, isSuccess } = getArrWords(userId, '200', filter);
+
 
   return (
     <>
-      {isInitBackground && <InitBackground initCount={4} hideInitBackground={hideInitBackground} />}
-      {!isInitBackground && <Game words={words} />}
+      {isError && <Error />}
+      {!isError && (
+        <>
+          {isLoading && <p className='text-2xl text-white mx-auto z-50'>Loading, please wait...</p>}
+          {(isLoading || isInitBackground) && (
+            <InitBackground initCount={4} hideInitBackground={hideInitBackground} />
+          )}
+          {!isLoading && !isInitBackground && isSuccess && <Game words={data} />}
+        </>
+      )}
     </>
   );
 };
 
 const Sprint = () => {
   const [chosenComplexity, setComplexity] = useState(0);
-  // const location = useLocation();
-  // if (location.current.search.from !== 'menu') {
-  //   return (
-  //     <div
-  // className='flex bg-sprint-bg bg-center bg-cover bg-no-repeat
-  // fixed z-50 top-0 left-0 w-full h-full pt-10 px-10'>
-  //       <StartGameFromWordBook />
-  //     </div>
-  //   );
-  // }
+
   return (
     <div className='flex bg-sprint-bg bg-center bg-cover bg-no-repeat fixed z-50 top-0 left-0 w-full h-full pt-10 px-10'>
       {!chosenComplexity && <Complexity setComplexity={(val: number) => setComplexity(val)} />}

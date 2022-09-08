@@ -22,7 +22,8 @@ const TeamMembers = [
     name: 'Andrew Rafalsky',
     role: 'Team Lead',
     bold: true,
-    contribution: 'fix cra, static code analysis, setup backend, routing, API connection feature',
+    contribution:
+      'fix cra, static code analysis, setup backend, routing, API connection feature, authorization, audio challenge',
   },
   {
     link: 'https://github.com/NikitaKakurin',
@@ -30,7 +31,7 @@ const TeamMembers = [
     name: 'Nikita Kakurin',
     role: 'developer',
     bold: false,
-    contribution: 'page components, fix styles, home page, main menu',
+    contribution: 'page components, fix styles, home page, main menu, page 401 and 404, sprint',
   },
 ];
 
@@ -53,9 +54,9 @@ interface ISectionsProps {
 }
 
 const showHideSections = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => {
-  if (unVisibleIdSet.has(id)) return 'opacity-0 -translate-y-[200px]';
+  if (unVisibleIdSet.has(id)) return 'opacity-0 -translate-y-[100px]';
   if (visibleIdSet.has(id)) return '';
-  return 'opacity-0 translate-y-[200px]';
+  return 'opacity-0 translate-y-[100px]';
 };
 
 const About = ({ visibleIdSet, id, unVisibleIdSet }: ISectionsProps) => (
@@ -292,7 +293,7 @@ const Home = () => {
           setVisibleIdSet((prev) => new Set([...Array.from(prev), section.id]));
         }
       }
-      if (top >= windowHeight - 100) {
+      if (top >= 150) {
         if (visibleIdSet.has(section.id)) {
           setVisibleIdSet((prev) => {
             prev.delete(section.id);
@@ -300,12 +301,12 @@ const Home = () => {
           });
         }
       }
-      if (bottom <= 61) {
+      if (bottom <= 65) {
         if (!unVisibleIdSet.has(section.id)) {
           setUnVisibleIdSet((prev) => new Set([...Array.from(prev), section.id]));
         }
       }
-      if (bottom > 61) {
+      if (bottom > 65) {
         if (unVisibleIdSet.has(section.id)) {
           setUnVisibleIdSet((prev) => {
             prev.delete(section.id);

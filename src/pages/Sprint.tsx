@@ -384,32 +384,6 @@ const Game = ({ words }: IGameProps) => {
   );
 };
 
-// const StartGameFromWordBook = () => {
-//   const [initCountState, setInitCountState] = useState(4);
-//   useEffect(() => {
-//     const showInitBackground = () => {
-//       const InitTimer = setInterval(() => {
-//         if (initCountState <= 0) {
-//           clearInterval(InitTimer);
-//           return;
-//         }
-//         setInitCountState((prev) => prev - 1);
-//       }, 1000);
-//       return InitTimer;
-//     };
-
-//     const timer = showInitBackground();
-//     return () => clearInterval(timer);
-//   }, [initCountState]);
-
-//   return (
-//     <>
-//       {initCountState !== 0 && <InitBackground initCount={initCountState} />}
-//       {initCountState === 0 && <Game />}
-//     </>
-//   );
-// };
-
 interface IStartGameProps {
   complexity: number;
 }
@@ -458,16 +432,7 @@ const StartGame = ({ complexity }: IStartGameProps) => {
 
 const Sprint = () => {
   const [chosenComplexity, setComplexity] = useState(0);
-  // const location = useLocation();
-  // if (location.current.search.from !== 'menu') {
-  //   return (
-  //     <div
-  // className='flex bg-sprint-bg bg-center bg-cover bg-no-repeat
-  // fixed z-50 top-0 left-0 w-full h-full pt-10 px-10'>
-  //       <StartGameFromWordBook />
-  //     </div>
-  //   );
-  // }
+
   return (
     <div className='flex bg-sprint-bg bg-center bg-cover bg-no-repeat fixed z-50 top-0 left-0 w-full h-full pt-10 px-10'>
       {!chosenComplexity && <Complexity setComplexity={(val: number) => setComplexity(val)} />}

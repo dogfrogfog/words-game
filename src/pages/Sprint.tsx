@@ -212,6 +212,7 @@ const Complexity = ({ setComplexity }: IComplexityProps) => (
     </div>
   </div>
 );
+
 interface IPronounceProps {
   audio: string;
 }
@@ -270,7 +271,7 @@ interface IResultsProps {
 
 const printResults = (arr: Array<IWord>): ReactNode =>
   arr.map((word) => (
-    <p className='flex justify-start items-center py-1' key={word.id}>
+    <p className='flex justify-start items-center py-1' key={word._id}>
       <PrintResultsBtn audio={word.audio} />
       <span className='text-lg font-semibold py-1 px-1'>{word.word}</span>
       <span className='text-lg font-semibold py-1 px-1'> - </span>

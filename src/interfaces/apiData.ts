@@ -6,18 +6,30 @@ export interface IAuth {
   name: string;
 }
 
-export interface IOptional {
-  test: number;
+export interface IOptionalWord {
+  learned: boolean;
+  correctAnswers: number;
+  wrongAnswers: number;
+}
+
+export interface IOptionalSetting {
+  learned: boolean;
+  correctAnswers: number;
+  wrongAnswers: number;
+}
+
+export interface IOptionalStatictics {
+  test: false;
 }
 
 export interface ISetting {
   wordsPerDay: number;
-  optional: IOptional;
+  optional: IOptionalSetting;
 }
 
 export interface IStatistic {
   wordsPerDay: number;
-  optional: IOptional;
+  optional: IOptionalStatictics;
 }
 
 export interface IUser {
@@ -28,11 +40,11 @@ export interface IUser {
 
 export interface IUserWord {
   difficulty: string;
-  optional: IOptional;
+  optional: IOptionalWord;
 }
 
 export interface IWord {
-  id: string;
+  _id: string;
   group: number;
   page: number;
   word: string;
@@ -49,5 +61,10 @@ export interface IWord {
 }
 
 export interface IFiltredWord extends IWord {
-  userWord?: Partial<IUserWord>;
+  userWord?: IUserWord;
+}
+
+export interface IFiltredWords {
+  paginatedResults: IFiltredWord[];
+  totalCount: number[];
 }

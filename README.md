@@ -1,4 +1,4 @@
-# RS lang
+# words game
 
 ### Getting Started with Create React App
 
